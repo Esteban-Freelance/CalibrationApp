@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Device id="hvsource_001">
+    <Type>HighVoltageSource</Type>
+    <Driver>MockHVSource</Driver>
+    <n>High Voltage Generator</n>
+    <Connection type="Serial">
+        <Port>COM4</Port>
+        <BaudRate>19200</BaudRate>
+        <Timeout>10000</Timeout>
+    </Connection>
+</Device>
