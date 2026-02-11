@@ -47,7 +47,7 @@ public class RecipeStep
     public Tolerance? Tolerance { get; set; }
     
     [XmlElement("OnFail")]
-    public FailAction OnFail { get; set; } = FailAction.Prompt;
+    public FailAction OnFail { get; set; } = FailAction.Abort;
     
     [XmlElement("Duration")]
     public int? DurationMs { get; set; }
