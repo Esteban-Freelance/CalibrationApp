@@ -2,7 +2,7 @@ using CalibrationApp.Interfaces;
 using CalibrationApp.Logging;
 using CalibrationApp.Models;
 
-namespace CalibrationApp.Devices;
+namespace CalibrationApp.Devices.Mocking;
 
 /// <summary>
 /// Mock implementation of a measurement device (e.g., multimeter).

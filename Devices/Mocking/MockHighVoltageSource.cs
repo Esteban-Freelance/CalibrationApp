@@ -2,7 +2,7 @@ using CalibrationApp.Interfaces;
 using CalibrationApp.Logging;
 using CalibrationApp.Models;
 
-namespace CalibrationApp.Devices;
+namespace CalibrationApp.Devices.Mocking;
 
 /// <summary>
 /// Mock implementation of a high voltage source/generator.
@@ -138,7 +138,7 @@ public class MockHighVoltageSource : ISourceDevice
         return Task.FromResult(new SourceStatus
         {
             IsEnabled = _outputEnabled,
-            ActualValue = _outputEnabled ? (_currentOutput?.Value ?? 0) : 0,
+            ActualValue = _outputEnabled ? _currentOutput?.Value ?? 0 : 0,
             Unit = _currentOutput?.Unit ?? "V",
             InRegulation = _outputEnabled,
             OverloadProtection = false

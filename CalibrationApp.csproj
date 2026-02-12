@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="NationalInstruments.Visa" Version="25.5.0.13" />
   </ItemGroup>
 
   <ItemGroup>
