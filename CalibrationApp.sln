@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "H&H Last", "..\H&H Last\H&H
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EA Last", "..\EA Last\EA Last.csproj", "{F1B34C8E-B610-4603-9D72-E2EFF97B6B7D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "..\ConsoleApp1\ConsoleApp1.csproj", "{6BC21698-8FFA-42BF-BA57-3C71B90C04B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsole", "..\ConsoleApp1\TestConsole.csproj", "{6BC21698-8FFA-42BF-BA57-3C71B90C04B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
