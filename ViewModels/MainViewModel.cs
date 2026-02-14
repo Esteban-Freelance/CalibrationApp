@@ -1,11 +1,12 @@
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CalibrationApp.Logging;
 using CalibrationApp.Models;
 using CalibrationApp.Services;
+using CalibrationDevices.Interfaces;
 using System.IO;
+using CalibrationDevices.Logging;
 
 namespace CalibrationApp.ViewModels;
 
@@ -144,7 +145,7 @@ public partial class MainViewModel : ObservableObject
             if (device != null)
             {
                 deviceVm.Status = device.Status.ToString();
-                deviceVm.IsConnected = device.Status == Interfaces.DeviceStatus.Connected;
+                deviceVm.IsConnected = device.Status == DeviceStatus.Connected;
             }
         }
         

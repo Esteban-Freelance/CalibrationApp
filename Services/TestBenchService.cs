@@ -1,8 +1,8 @@
-using CalibrationApp.Devices;
-using CalibrationApp.Devices.Mocking;
-using CalibrationApp.Interfaces;
 using CalibrationApp.Logging;
 using CalibrationApp.Models;
+using CalibrationDevices.Devices.Mocking;
+using CalibrationDevices.Interfaces;
+using CalibrationDevices.Logging;
 
 namespace CalibrationApp.Services;
 

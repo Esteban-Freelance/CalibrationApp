@@ -2,6 +2,7 @@ using System.IO;
 using System.Xml.Serialization;
 using CalibrationApp.Logging;
 using CalibrationApp.Models;
+using CalibrationDevices.Logging;
 
 namespace CalibrationApp.Services;
 

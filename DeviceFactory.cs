@@ -1,9 +1,10 @@
-using CalibrationApp.Devices.Mocking;
-using CalibrationApp.Interfaces;
+using CalibrationDevices.Devices.Mocking;
 using CalibrationApp.Logging;
 using CalibrationApp.Models;
+using CalibrationDevices.Logging;
+using CalibrationDevices.Interfaces;
 
-namespace CalibrationApp.Devices;
+namespace CalibrationApp;
 
 /// <summary>
 /// Factory for creating device instances based on configuration.

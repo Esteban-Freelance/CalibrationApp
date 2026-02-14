@@ -19,4 +19,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Devices\Devices.csproj" />
+  </ItemGroup>
+
 </Project>

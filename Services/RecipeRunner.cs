@@ -1,7 +1,7 @@
-using CalibrationApp.Devices;
-using CalibrationApp.Interfaces;
 using CalibrationApp.Logging;
 using CalibrationApp.Models;
+using CalibrationDevices.Interfaces;
+using CalibrationDevices.Logging;
 
 namespace CalibrationApp.Services;
 
