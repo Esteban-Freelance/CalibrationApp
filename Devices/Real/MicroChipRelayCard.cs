@@ -15,8 +15,9 @@ namespace CalibrationApp.Devices.Real
         //  HTTP ENDPOINTS — update after running probe
         // ──────────────────────────────────────────────
         private string _statusEndpoint = "/status.xml";
-        private string _relayOnEndpoint = "/relay.cgi?state=1";
-        private string _relayOffEndpoint = "/relay.cgi?state=0";
+        private string _relayOnEndpoint = "/forms.htm?rel1=1";
+        
+        private string _relayOffEndpoint = "/forms.htm?rel1=0";
 
         private static readonly string[] CandidateStatusEndpoints =
         [
@@ -116,8 +117,9 @@ namespace CalibrationApp.Devices.Real
             if (_status != DeviceStatus.Connected)
                 throw new InvalidOperationException("Device not connected");
 
-            string url = channel >= 1 ? _relayOnEndpoint : _relayOffEndpoint;
-            var response = await _http.GetAsync($"{_config.BaseUrl}{url}");
+            string endpoint = channel >= 1 ? _relayOnEndpoint : _relayOffEndpoint;
+            var url = $"{_config.BaseUrl}{endpoint}";
+            var response = await _http.GetAsync(url);
             response.EnsureSuccessStatusCode();
         }
 
@@ -140,7 +142,7 @@ namespace CalibrationApp.Devices.Real
             {
                 string data = await _http.GetStringAsync($"{_config.BaseUrl}{_statusEndpoint}");
 
-                var match = Regex.Match(data, @"[Rr]elay[^<>]*[>:\s]*(ON|OFF|1|0|true|false)", RegexOptions.IgnoreCase);
+                var match = Regex.Match(data, @"[Rr]el[^<>]*[>:\s]*(ON|OFF|1|0|true|false)", RegexOptions.IgnoreCase);
                 if (match.Success)
                 {
                     string val = match.Groups[1].Value.ToUpper();
