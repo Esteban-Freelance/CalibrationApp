@@ -23,4 +23,7 @@ public partial class MainWindow : Window
             LogScrollViewer?.ScrollToEnd();
         }
     }
+
+ 
+
 }

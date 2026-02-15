@@ -1,0 +1,754 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Recipe id="HuH-Load-60V-Voltag" name="HuH Load 60V DC Voltage - EA-PS, Keithley 3706A">
+  <Description>Calibration of Höcherl &amp; Hackl Electronic Load ZS 530-3-SV60-ZS02-ZS13-SA9. DC Voltage only (18Bit and 13Bit). EA-PS as power supply, Keithley 3706A as reference meter (source of truth).</Description>
+  <Version>1.0</Version>
+  <Author>CalibrationApp</Author>
+  <CreatedDate>2026-02-15</CreatedDate>
+
+  <RequiredDevices>
+    <Device role="PowerSupply" type="Source" description="EA-PS Power Supply - Supplies voltage to the load" />
+    <Device role="ReferenceMeter" type="Measurement" description="Keithley 3706A - Reference meter (source of truth / Richtiger Wert)" />
+    <Device role="Calibree" type="Measurement" description="Höcherl &amp; Hackl ZS 530 - Device under test" />
+  </RequiredDevices>
+
+  <Steps>
+
+    <!-- INITIALIZATION -->
+
+    <Step type="Message" order="1" name="Start Calibration">
+      <Description>Initialize calibration of Höcherl &amp; Hackl Electronic Load - DC Voltage</Description>
+    </Step>
+
+    <Step type="Configure" order="2" name="Reset Power Supply">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>Reset</Action>
+    </Step>
+
+    <Step type="Configure" order="3" name="Reset Reference Meter">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Reset</Action>
+    </Step>
+
+    <Step type="Configure" order="4" name="Reset Calibree">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Reset</Action>
+    </Step>
+
+    <Step type="Wait" order="5" name="Settling after reset">
+      <Duration>3000</Duration>
+    </Step>
+
+    <!-- ================================================================== -->
+    <!-- SECTION 1: DC VOLTAGE 60V - 18Bit                                  -->
+    <!-- 0V, 5V, 10V, 20V, 30V, 40V, 50V, 60V                             -->
+    <!-- ================================================================== -->
+
+    <Step type="Message" order="100" name="DC Voltage 60V 18Bit - Begin">
+      <Description>Starting DC Voltage measurement, 60V range, 18Bit resolution</Description>
+    </Step>
+
+    <!-- 0V DC 18Bit -->
+    <Step type="Configure" order="101" name="Set Power Supply 0V DC">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <SourceType>VoltageDC</SourceType>
+        <Value>0</Value>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+    <Step type="Wait" order="102" name="Settling 0V DC">
+      <Duration>2000</Duration>
+    </Step>
+    <Step type="Measurement" order="103" name="Reference Meter Read 0V DC">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>100</Range>
+        <Unit>V</Unit>
+      </Parameters>
+      <StoreAs>RefMeter_DCV18_0V</StoreAs>
+    </Step>
+    <Step type="Measurement" order="104" name="Calibree Read 0V DC 18Bit">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <Resolution>18Bit</Resolution>
+      </Parameters>
+      <Tolerance>
+        <Nominal>0</Nominal>
+        <AbsoluteError>0.030</AbsoluteError>
+        <Unit>V</Unit>
+      </Tolerance>
+      <MeasurementUncertainty>0.030</MeasurementUncertainty>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 5V DC 18Bit -->
+    <Step type="Configure" order="111" name="Set Power Supply 5V DC">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <SourceType>VoltageDC</SourceType>
+        <Value>5</Value>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+    <Step type="Wait" order="112" name="Settling 5V DC">
+      <Duration>2000</Duration>
+    </Step>
+    <Step type="Measurement" order="113" name="Reference Meter Read 5V DC">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>100</Range>
+        <Unit>V</Unit>
+      </Parameters>
+      <StoreAs>RefMeter_DCV18_5V</StoreAs>
+    </Step>
+    <Step type="Measurement" order="114" name="Calibree Read 5V DC 18Bit">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <Resolution>18Bit</Resolution>
+      </Parameters>
+      <Tolerance>
+        <Nominal>5</Nominal>
+        <AbsoluteError>0.035008</AbsoluteError>
+        <Unit>V</Unit>
+      </Tolerance>
+      <MeasurementUncertainty>0.035008</MeasurementUncertainty>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 10V DC 18Bit -->
+    <Step type="Configure" order="121" name="Set Power Supply 10V DC">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <SourceType>VoltageDC</SourceType>
+        <Value>10</Value>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+    <Step type="Wait" order="122" name="Settling 10V DC">
+      <Duration>2000</Duration>
+    </Step>
+    <Step type="Measurement" order="123" name="Reference Meter Read 10V DC">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>100</Range>
+        <Unit>V</Unit>
+      </Parameters>
+      <StoreAs>RefMeter_DCV18_10V</StoreAs>
+    </Step>
+    <Step type="Measurement" order="124" name="Calibree Read 10V DC 18Bit">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <Resolution>18Bit</Resolution>
+      </Parameters>
+      <Tolerance>
+        <Nominal>10</Nominal>
+        <AbsoluteError>0.040011</AbsoluteError>
+        <Unit>V</Unit>
+      </Tolerance>
+      <MeasurementUncertainty>0.040011</MeasurementUncertainty>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 20V DC 18Bit -->
+    <Step type="Configure" order="131" name="Set Power Supply 20V DC">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <SourceType>VoltageDC</SourceType>
+        <Value>20</Value>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+    <Step type="Wait" order="132" name="Settling 20V DC">
+      <Duration>2000</Duration>
+    </Step>
+    <Step type="Measurement" order="133" name="Reference Meter Read 20V DC">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>100</Range>
+        <Unit>V</Unit>
+      </Parameters>
+      <StoreAs>RefMeter_DCV18_20V</StoreAs>
+    </Step>
+    <Step type="Measurement" order="134" name="Calibree Read 20V DC 18Bit">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <Resolution>18Bit</Resolution>
+      </Parameters>
+      <Tolerance>
+        <Nominal>20</Nominal>
+        <AbsoluteError>0.050017</AbsoluteError>
+        <Unit>V</Unit>
+      </Tolerance>
+      <MeasurementUncertainty>0.050017</MeasurementUncertainty>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 30V DC 18Bit -->
+    <Step type="Configure" order="141" name="Set Power Supply 30V DC">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <SourceType>VoltageDC</SourceType>
+        <Value>30</Value>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+    <Step type="Wait" order="142" name="Settling 30V DC">
+      <Duration>2000</Duration>
+    </Step>
+    <Step type="Measurement" order="143" name="Reference Meter Read 30V DC">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>100</Range>
+        <Unit>V</Unit>
+      </Parameters>
+      <StoreAs>RefMeter_DCV18_30V</StoreAs>
+    </Step>
+    <Step type="Measurement" order="144" name="Calibree Read 30V DC 18Bit">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <Resolution>18Bit</Resolution>
+      </Parameters>
+      <Tolerance>
+        <Nominal>30</Nominal>
+        <AbsoluteError>0.060022</AbsoluteError>
+        <Unit>V</Unit>
+      </Tolerance>
+      <MeasurementUncertainty>0.060022</MeasurementUncertainty>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 40V DC 18Bit -->
+    <Step type="Configure" order="151" name="Set Power Supply 40V DC">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <SourceType>VoltageDC</SourceType>
+        <Value>40</Value>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+    <Step type="Wait" order="152" name="Settling 40V DC">
+      <Duration>2000</Duration>
+    </Step>
+    <Step type="Measurement" order="153" name="Reference Meter Read 40V DC">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>100</Range>
+        <Unit>V</Unit>
+      </Parameters>
+      <StoreAs>RefMeter_DCV18_40V</StoreAs>
+    </Step>
+    <Step type="Measurement" order="154" name="Calibree Read 40V DC 18Bit">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <Resolution>18Bit</Resolution>
+      </Parameters>
+      <Tolerance>
+        <Nominal>40</Nominal>
+        <AbsoluteError>0.070028</AbsoluteError>
+        <Unit>V</Unit>
+      </Tolerance>
+      <MeasurementUncertainty>0.070028</MeasurementUncertainty>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 50V DC 18Bit -->
+    <Step type="Configure" order="161" name="Set Power Supply 50V DC">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <SourceType>VoltageDC</SourceType>
+        <Value>50</Value>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+    <Step type="Wait" order="162" name="Settling 50V DC">
+      <Duration>2000</Duration>
+    </Step>
+    <Step type="Measurement" order="163" name="Reference Meter Read 50V DC">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>100</Range>
+        <Unit>V</Unit>
+      </Parameters>
+      <StoreAs>RefMeter_DCV18_50V</StoreAs>
+    </Step>
+    <Step type="Measurement" order="164" name="Calibree Read 50V DC 18Bit">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <Resolution>18Bit</Resolution>
+      </Parameters>
+      <Tolerance>
+        <Nominal>50</Nominal>
+        <AbsoluteError>0.080034</AbsoluteError>
+        <Unit>V</Unit>
+      </Tolerance>
+      <MeasurementUncertainty>0.080034</MeasurementUncertainty>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 60V DC 18Bit -->
+    <Step type="Configure" order="171" name="Set Power Supply 60V DC">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <SourceType>VoltageDC</SourceType>
+        <Value>60</Value>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+    <Step type="Wait" order="172" name="Settling 60V DC">
+      <Duration>2000</Duration>
+    </Step>
+    <Step type="Measurement" order="173" name="Reference Meter Read 60V DC">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>100</Range>
+        <Unit>V</Unit>
+      </Parameters>
+      <StoreAs>RefMeter_DCV18_60V</StoreAs>
+    </Step>
+    <Step type="Measurement" order="174" name="Calibree Read 60V DC 18Bit">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <Resolution>18Bit</Resolution>
+      </Parameters>
+      <Tolerance>
+        <Nominal>60</Nominal>
+        <AbsoluteError>0.09004</AbsoluteError>
+        <Unit>V</Unit>
+      </Tolerance>
+      <MeasurementUncertainty>0.09004</MeasurementUncertainty>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <Step type="Configure" order="175" name="Disable Power Supply Output">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>DisableOutput</Action>
+    </Step>
+
+    <!-- ================================================================== -->
+    <!-- SECTION 2: DC VOLTAGE 60V - 13Bit                                  -->
+    <!-- 0V, 5V, 10V, 20V, 30V, 40V, 50V, 60V                             -->
+    <!-- ================================================================== -->
+
+    <Step type="Message" order="200" name="DC Voltage 60V 13Bit - Begin">
+      <Description>Starting DC Voltage measurement, 60V range, 13Bit resolution</Description>
+    </Step>
+
+    <!-- 0V DC 13Bit -->
+    <Step type="Configure" order="201" name="Set Power Supply 0V DC">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <SourceType>VoltageDC</SourceType>
+        <Value>0</Value>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+    <Step type="Wait" order="202" name="Settling 0V DC 13Bit">
+      <Duration>2000</Duration>
+    </Step>
+    <Step type="Measurement" order="203" name="Reference Meter Read 0V DC 13Bit">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>100</Range>
+        <Unit>V</Unit>
+      </Parameters>
+      <StoreAs>RefMeter_DCV13_0V</StoreAs>
+    </Step>
+    <Step type="Measurement" order="204" name="Calibree Read 0V DC 13Bit">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <Resolution>13Bit</Resolution>
+      </Parameters>
+      <Tolerance>
+        <Nominal>0</Nominal>
+        <AbsoluteError>0.042</AbsoluteError>
+        <Unit>V</Unit>
+      </Tolerance>
+      <MeasurementUncertainty>0.042</MeasurementUncertainty>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 5V DC 13Bit -->
+    <Step type="Configure" order="211" name="Set Power Supply 5V DC">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <SourceType>VoltageDC</SourceType>
+        <Value>5</Value>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+    <Step type="Wait" order="212" name="Settling 5V DC 13Bit">
+      <Duration>2000</Duration>
+    </Step>
+    <Step type="Measurement" order="213" name="Reference Meter Read 5V DC 13Bit">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>100</Range>
+        <Unit>V</Unit>
+      </Parameters>
+      <StoreAs>RefMeter_DCV13_5V</StoreAs>
+    </Step>
+    <Step type="Measurement" order="214" name="Calibree Read 5V DC 13Bit">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <Resolution>13Bit</Resolution>
+      </Parameters>
+      <Tolerance>
+        <Nominal>5</Nominal>
+        <AbsoluteError>0.04951</AbsoluteError>
+        <Unit>V</Unit>
+      </Tolerance>
+      <MeasurementUncertainty>0.04951</MeasurementUncertainty>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 10V DC 13Bit -->
+    <Step type="Configure" order="221" name="Set Power Supply 10V DC">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <SourceType>VoltageDC</SourceType>
+        <Value>10</Value>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+    <Step type="Wait" order="222" name="Settling 10V DC 13Bit">
+      <Duration>2000</Duration>
+    </Step>
+    <Step type="Measurement" order="223" name="Reference Meter Read 10V DC 13Bit">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>100</Range>
+        <Unit>V</Unit>
+      </Parameters>
+      <StoreAs>RefMeter_DCV13_10V</StoreAs>
+    </Step>
+    <Step type="Measurement" order="224" name="Calibree Read 10V DC 13Bit">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <Resolution>13Bit</Resolution>
+      </Parameters>
+      <Tolerance>
+        <Nominal>10</Nominal>
+        <AbsoluteError>0.057014</AbsoluteError>
+        <Unit>V</Unit>
+      </Tolerance>
+      <MeasurementUncertainty>0.057014</MeasurementUncertainty>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 20V DC 13Bit -->
+    <Step type="Configure" order="231" name="Set Power Supply 20V DC">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <SourceType>VoltageDC</SourceType>
+        <Value>20</Value>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+    <Step type="Wait" order="232" name="Settling 20V DC 13Bit">
+      <Duration>2000</Duration>
+    </Step>
+    <Step type="Measurement" order="233" name="Reference Meter Read 20V DC 13Bit">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>100</Range>
+        <Unit>V</Unit>
+      </Parameters>
+      <StoreAs>RefMeter_DCV13_20V</StoreAs>
+    </Step>
+    <Step type="Measurement" order="234" name="Calibree Read 20V DC 13Bit">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <Resolution>13Bit</Resolution>
+      </Parameters>
+      <Tolerance>
+        <Nominal>20</Nominal>
+        <AbsoluteError>0.072016</AbsoluteError>
+        <Unit>V</Unit>
+      </Tolerance>
+      <MeasurementUncertainty>0.072016</MeasurementUncertainty>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 30V DC 13Bit -->
+    <Step type="Configure" order="241" name="Set Power Supply 30V DC">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <SourceType>VoltageDC</SourceType>
+        <Value>30</Value>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+    <Step type="Wait" order="242" name="Settling 30V DC 13Bit">
+      <Duration>2000</Duration>
+    </Step>
+    <Step type="Measurement" order="243" name="Reference Meter Read 30V DC 13Bit">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>100</Range>
+        <Unit>V</Unit>
+      </Parameters>
+      <StoreAs>RefMeter_DCV13_30V</StoreAs>
+    </Step>
+    <Step type="Measurement" order="244" name="Calibree Read 30V DC 13Bit">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <Resolution>13Bit</Resolution>
+      </Parameters>
+      <Tolerance>
+        <Nominal>30</Nominal>
+        <AbsoluteError>0.087024</AbsoluteError>
+        <Unit>V</Unit>
+      </Tolerance>
+      <MeasurementUncertainty>0.087024</MeasurementUncertainty>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 40V DC 13Bit -->
+    <Step type="Configure" order="251" name="Set Power Supply 40V DC">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <SourceType>VoltageDC</SourceType>
+        <Value>40</Value>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+    <Step type="Wait" order="252" name="Settling 40V DC 13Bit">
+      <Duration>2000</Duration>
+    </Step>
+    <Step type="Measurement" order="253" name="Reference Meter Read 40V DC 13Bit">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>100</Range>
+        <Unit>V</Unit>
+      </Parameters>
+      <StoreAs>RefMeter_DCV13_40V</StoreAs>
+    </Step>
+    <Step type="Measurement" order="254" name="Calibree Read 40V DC 13Bit">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <Resolution>13Bit</Resolution>
+      </Parameters>
+      <Tolerance>
+        <Nominal>40</Nominal>
+        <AbsoluteError>0.102</AbsoluteError>
+        <Unit>V</Unit>
+      </Tolerance>
+      <MeasurementUncertainty>0.102</MeasurementUncertainty>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 50V DC 13Bit -->
+    <Step type="Configure" order="261" name="Set Power Supply 50V DC">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <SourceType>VoltageDC</SourceType>
+        <Value>50</Value>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+    <Step type="Wait" order="262" name="Settling 50V DC 13Bit">
+      <Duration>2000</Duration>
+    </Step>
+    <Step type="Measurement" order="263" name="Reference Meter Read 50V DC 13Bit">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>100</Range>
+        <Unit>V</Unit>
+      </Parameters>
+      <StoreAs>RefMeter_DCV13_50V</StoreAs>
+    </Step>
+    <Step type="Measurement" order="264" name="Calibree Read 50V DC 13Bit">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <Resolution>13Bit</Resolution>
+      </Parameters>
+      <Tolerance>
+        <Nominal>50</Nominal>
+        <AbsoluteError>0.117</AbsoluteError>
+        <Unit>V</Unit>
+      </Tolerance>
+      <MeasurementUncertainty>0.117</MeasurementUncertainty>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 60V DC 13Bit -->
+    <Step type="Configure" order="271" name="Set Power Supply 60V DC">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <SourceType>VoltageDC</SourceType>
+        <Value>60</Value>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+    <Step type="Wait" order="272" name="Settling 60V DC 13Bit">
+      <Duration>2000</Duration>
+    </Step>
+    <Step type="Measurement" order="273" name="Reference Meter Read 60V DC 13Bit">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>100</Range>
+        <Unit>V</Unit>
+      </Parameters>
+      <StoreAs>RefMeter_DCV13_60V</StoreAs>
+    </Step>
+    <Step type="Measurement" order="274" name="Calibree Read 60V DC 13Bit">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Measure</Action>
+      <Parameters>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <Resolution>13Bit</Resolution>
+      </Parameters>
+      <Tolerance>
+        <Nominal>60</Nominal>
+        <AbsoluteError>0.132</AbsoluteError>
+        <Unit>V</Unit>
+      </Tolerance>
+      <MeasurementUncertainty>0.132</MeasurementUncertainty>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <Step type="Configure" order="275" name="Disable Power Supply Output">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>DisableOutput</Action>
+    </Step>
+
+    <!-- ================================================================== -->
+    <!-- SAFE SHUTDOWN                                                       -->
+    <!-- ================================================================== -->
+
+    <Step type="Configure" order="900" name="Final - Disable Power Supply Output">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>DisableOutput</Action>
+    </Step>
+
+    <Step type="Configure" order="901" name="Final - Reset Power Supply">
+      <DeviceRole>PowerSupply</DeviceRole>
+      <Action>Reset</Action>
+    </Step>
+
+    <Step type="Configure" order="902" name="Final - Reset Reference Meter">
+      <DeviceRole>ReferenceMeter</DeviceRole>
+      <Action>Reset</Action>
+    </Step>
+
+    <Step type="Configure" order="903" name="Final - Reset Calibree">
+      <DeviceRole>Calibree</DeviceRole>
+      <Action>Reset</Action>
+    </Step>
+
+    <Step type="Message" order="999" name="Calibration Complete">
+      <Description>DC Voltage calibration completed (18Bit and 13Bit). Generate report.</Description>
+    </Step>
+
+  </Steps>
+</Recipe>
