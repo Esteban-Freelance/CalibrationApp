@@ -14,13 +14,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Configs\**\*.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\CalibriDevices\CalibriDevices.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Devices\CalibriDevices.csproj" />
+    <None Update="Configs\**\*.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
