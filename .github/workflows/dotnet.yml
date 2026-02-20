@@ -20,7 +20,7 @@ jobs:
         dotnet-version: '8.0.x'
     
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore CalibriCore CalibriDevices NetworkScanner CalibriConsole CalibriTests
     
     - name: Build (cross-platform only)
       run: dotnet build CalibriCore CalibriDevices NetworkScanner CalibriConsole CalibriTests --no-restore
