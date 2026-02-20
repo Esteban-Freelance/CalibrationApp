@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestBench id="station1" name="Calibration Station 1">
+    <Devices>
+        <Device ref="calibrator_001" role="Calibrator" />
+        <Device ref="multimeter_001" role="Calibree" />
+        <Device ref="switch_001" role="SwitchMatrix" />
+        <Device ref="hvsource_001" role="HVSource" />
+    </Devices>
+    <Wiring>
+        <Route name="VoltageDC" switchChannel="1" description="DC Voltage path" />
+        <Route name="VoltageAC" switchChannel="2" description="AC Voltage path" />
+        <Route name="CurrentDC" switchChannel="3" description="DC Current path" />
+        <Route name="Resistance" switchChannel="5" description="Resistance path" />
+        <Route name="HighVoltage" switchChannel="7" description="HV path" />
+    </Wiring>
+</TestBench>

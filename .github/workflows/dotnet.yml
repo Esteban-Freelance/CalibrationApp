@@ -1,0 +1,28 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Build and test cross-platform projects
+      run: |
+        dotnet build CalibriCore/CalibriCore.csproj
+        dotnet build CalibriDevices/CalibriDevices.csproj
+        dotnet build NetworkScanner/NetworkScanner.csproj
+        dotnet build CalibriConsole/CalibriConsole.csproj
+        dotnet test CalibriTests/CalibriTests.csproj --verbosity normal

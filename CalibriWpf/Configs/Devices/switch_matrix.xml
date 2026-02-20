@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Device id="switch_001">
+    <Type>SwitchMatrix</Type>
+    <Driver>MockSwitchMatrix</Driver>
+    <n>Relay Switch Matrix</n>
+    <Connection type="Serial">
+        <Port>COM3</Port>
+        <BaudRate>9600</BaudRate>
+        <Timeout>3000</Timeout>
+    </Connection>
+</Device>

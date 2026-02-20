@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Recipe id="cal_voltage_001" name="DC Voltage Calibration">
+    <Description>Calibration procedure for DC voltage ranges</Description>
+    <RequiredRoles>
+        <Role>Calibrator</Role>
+        <Role>Calibree</Role>
+    </RequiredRoles>
+    <Steps>
+        <Step type="Switch" order="1" name="Select DC Voltage Path">
+            <DeviceRole>SwitchMatrix</DeviceRole>
+            <Action>SetChannel</Action>
+            <Parameters>
+                <RouteName>VoltageDC</RouteName>
+            </Parameters>
+        </Step>
+        
+        <Step type="Wait" order="2" name="Settling Time">
+            <Duration>1000</Duration>
+        </Step>
+        
+        <Step type="Configure" order="3" name="Set Calibrator 1V">
+            <DeviceRole>Calibrator</DeviceRole>
+            <Action>SetOutput</Action>
+            <Parameters>
+                <Voltage>1.0</Voltage>
+                <Unit>V</Unit>
+            </Parameters>
+        </Step>
+        
+        <Step type="Wait" order="4" name="Output Settling">
+            <Duration>500</Duration>
+        </Step>
+        
+        <Step type="Measurement" order="5" name="Measure 1V">
+            <DeviceRole>Calibree</DeviceRole>
+            <Action>Measure</Action>
+            <Parameters>
+                <Range>2</Range>
+                <Unit>V</Unit>
+                <MeasurementType>VoltageDC</MeasurementType>
+            </Parameters>
+            <Tolerance>
+                <Nominal>1.0</Nominal>
+                <ErrorPercent>0.1</ErrorPercent>
+            </Tolerance>
+            <OnFail>Prompt</OnFail>
+        </Step>
+        
+        <Step type="Configure" order="6" name="Set Calibrator 10V">
+            <DeviceRole>Calibrator</DeviceRole>
+            <Action>SetOutput</Action>
+            <Parameters>
+                <Voltage>10.0</Voltage>
+                <Unit>V</Unit>
+            </Parameters>
+        </Step>
+        
+        <Step type="Wait" order="7" name="Output Settling">
+            <Duration>500</Duration>
+        </Step>
+        
+        <Step type="Measurement" order="8" name="Measure 10V">
+            <DeviceRole>Calibree</DeviceRole>
+            <Action>Measure</Action>
+            <Parameters>
+                <Range>20</Range>
+                <Unit>V</Unit>
+                <MeasurementType>VoltageDC</MeasurementType>
+            </Parameters>
+            <Tolerance>
+                <Nominal>10.0</Nominal>
+                <ErrorPercent>0.05</ErrorPercent>
+            </Tolerance>
+            <OnFail>Prompt</OnFail>
+        </Step>
+        
+        <Step type="Configure" order="9" name="Set Calibrator 100V">
+            <DeviceRole>Calibrator</DeviceRole>
+            <Action>SetOutput</Action>
+            <Parameters>
+                <Voltage>100.0</Voltage>
+                <Unit>V</Unit>
+            </Parameters>
+        </Step>
+        
+        <Step type="Wait" order="10" name="Output Settling">
+            <Duration>500</Duration>
+        </Step>
+        
+        <Step type="Measurement" order="11" name="Measure 100V">
+            <DeviceRole>Calibree</DeviceRole>
+            <Action>Measure</Action>
+            <Parameters>
+                <Range>200</Range>
+                <Unit>V</Unit>
+                <MeasurementType>VoltageDC</MeasurementType>
+            </Parameters>
+            <Tolerance>
+                <Nominal>100.0</Nominal>
+                <ErrorPercent>0.02</ErrorPercent>
+            </Tolerance>
+            <OnFail>Prompt</OnFail>
+        </Step>
+    </Steps>
+</Recipe>
