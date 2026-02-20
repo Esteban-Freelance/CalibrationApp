@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalibriDevices", "CalibriDe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkScanner", "NetworkScanner\NetworkScanner.csproj", "{69943B03-2FFB-429D-79A2-E525445262BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalibriConsole", "CalibriConsole\CalibriConsole.csproj", "{2C97FEFA-47FE-42D2-909D-C52C78881D2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalibriTests", "CalibriTests\CalibriTests.csproj", "{E565E50D-13E4-486B-B2D5-C4521960C17E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{69943B03-2FFB-429D-79A2-E525445262BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69943B03-2FFB-429D-79A2-E525445262BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69943B03-2FFB-429D-79A2-E525445262BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C97FEFA-47FE-42D2-909D-C52C78881D2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C97FEFA-47FE-42D2-909D-C52C78881D2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C97FEFA-47FE-42D2-909D-C52C78881D2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C97FEFA-47FE-42D2-909D-C52C78881D2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E565E50D-13E4-486B-B2D5-C4521960C17E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E565E50D-13E4-486B-B2D5-C4521960C17E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E565E50D-13E4-486B-B2D5-C4521960C17E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E565E50D-13E4-486B-B2D5-C4521960C17E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
