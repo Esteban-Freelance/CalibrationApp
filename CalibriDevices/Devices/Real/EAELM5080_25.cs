@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 
 namespace CalibriDevices.Devices.Real;
-public class EAELM5080_25: IMeasurementDevice
+public class EAELM5080_25 : IMeasurementDevice
 {
     private readonly TcpConfig _config;
     private TcpClient? _client;

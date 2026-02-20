@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CalibriCore\CalibriCore.csproj" />
     <ProjectReference Include="..\CalibriDevices\CalibriDevices.csproj" />
     <ProjectReference Include="..\NetworkScanner\NetworkScanner.csproj" />
   </ItemGroup>

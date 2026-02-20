@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 
 namespace Devices.Devices.Real;
-public class EAPS8720U: ISourceDevice
+public class EAPS8720U : ISourceDevice
 {
     private readonly TcpConfig _config;
     private TcpClient? _tcpClient;

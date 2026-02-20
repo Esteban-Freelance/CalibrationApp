@@ -1,4 +1,4 @@
-namespace CalibrationApp.Models;
+namespace CalibriCore.Models;
 
 public class CalibrationReport
 {

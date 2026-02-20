@@ -1,10 +1,10 @@
-using CalibrationApp.Logging;
-using CalibrationApp.Models;
+using CalibrationDevices.Logging;
+using CalibriCore.Models;
 using CalibrationDevices.Devices.Mocking;
 using CalibrationDevices.Interfaces;
 using CalibrationDevices.Logging;
 
-namespace CalibrationApp.Services;
+namespace CalibriCore.Services;
 
 /// <summary>
 /// Manages a test bench with connected devices.
@@ -14,27 +14,27 @@ public class TestBenchService
     private readonly ILogService _log;
     private readonly Dictionary<string, IDevice> _devices = new();
     private readonly Dictionary<string, string> _roleToDeviceId = new();
-    
+
     public TestBenchConfig? CurrentConfig { get; private set; }
     public bool IsInitialized => CurrentConfig != null && _devices.Any();
-    
+
     public event EventHandler<string>? DeviceStatusChanged;
-    
+
     public TestBenchService(ILogService? logService = null)
     {
-        _log = logService ?? LogService.Instance;
+        _log = logService ?? throw new ArgumentNullException(nameof(logService));
     }
-    
+
     public async Task InitializeAsync(TestBenchConfig benchConfig, IEnumerable<DeviceConfig> deviceConfigs)
     {
         _log.Info($"Initializing test bench: {benchConfig.Name}");
-        
+
         CurrentConfig = benchConfig;
         _devices.Clear();
         _roleToDeviceId.Clear();
-        
+
         var deviceDict = deviceConfigs.ToDictionary(d => d.Id);
-        
+
         foreach (var deviceRef in benchConfig.Devices)
         {
             if (!deviceDict.TryGetValue(deviceRef.DeviceId, out var deviceConfig))
@@ -42,13 +42,13 @@ public class TestBenchService
                 _log.Error($"Device not found: {deviceRef.DeviceId}");
                 continue;
             }
-            
+
             try
             {
                 var device = DeviceFactory.CreateDevice(deviceConfig, _log);
                 _devices[deviceRef.DeviceId] = device;
                 _roleToDeviceId[deviceRef.Role] = deviceRef.DeviceId;
-                
+
                 _log.Debug($"Created device {device.Name} with role {deviceRef.Role}");
             }
             catch (Exception ex)
@@ -56,20 +56,20 @@ public class TestBenchService
                 _log.Error($"Failed to create device {deviceRef.DeviceId}: {ex.Message}");
             }
         }
-        
+
         // Wire up mock devices for simulation
         WireMockDevices();
-        
+
         _log.Info($"Test bench initialized with {_devices.Count} devices");
     }
-    
+
     private void WireMockDevices()
     {
         // Connect calibrators to measurement devices for simulation
         var calibrators = _devices.Values.OfType<MockSourceDevice>().ToList();
         var hvSources = _devices.Values.OfType<MockHighVoltageSource>().ToList();
         var meters = _devices.Values.OfType<MockMeasurementDevice>().ToList();
-        
+
         if (meters.Any())
         {
             var meter = meters.First();
@@ -85,11 +85,11 @@ public class TestBenchService
             }
         }
     }
-    
+
     public async Task ConnectAllAsync()
     {
         _log.Info("Connecting all devices...");
-        
+
         foreach (var device in _devices.Values)
         {
             try
@@ -103,11 +103,11 @@ public class TestBenchService
             }
         }
     }
-    
+
     public async Task DisconnectAllAsync()
     {
         _log.Info("Disconnecting all devices...");
-        
+
         foreach (var device in _devices.Values)
         {
             try
@@ -121,11 +121,11 @@ public class TestBenchService
             }
         }
     }
-    
+
     public async Task SafeShutdownAsync()
     {
         _log.Warning("Initiating safe shutdown...");
-        
+
         // First, reset all devices to safe state
         foreach (var device in _devices.Values)
         {
@@ -138,13 +138,13 @@ public class TestBenchService
                 _log.Error($"Failed to reset {device.Name}: {ex.Message}");
             }
         }
-        
+
         // Then disconnect
         await DisconnectAllAsync();
-        
+
         _log.Info("Safe shutdown complete");
     }
-    
+
     public IDevice? GetDeviceByRole(string role)
     {
         if (_roleToDeviceId.TryGetValue(role, out var deviceId))
@@ -153,12 +153,12 @@ public class TestBenchService
         }
         return null;
     }
-    
+
     public IDevice? GetDeviceById(string id)
     {
         return _devices.GetValueOrDefault(id);
     }
-    
+
     public IEnumerable<(string Role, IDevice Device)> GetAllDevices()
     {
         foreach (var kvp in _roleToDeviceId)
@@ -169,7 +169,7 @@ public class TestBenchService
             }
         }
     }
-    
+
     public bool HasRequiredRoles(IEnumerable<string> requiredRoles)
     {
         return requiredRoles.All(role => _roleToDeviceId.ContainsKey(role));

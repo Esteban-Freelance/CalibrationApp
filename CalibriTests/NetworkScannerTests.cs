@@ -1,5 +1,4 @@
 using Xunit;
-using System.Net.NetworkInformation;
 
 namespace CalibriTests;
 

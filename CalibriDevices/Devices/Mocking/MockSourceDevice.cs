@@ -14,24 +14,24 @@ public class MockSourceDevice : ISourceDevice
     private DeviceStatus _status = DeviceStatus.Disconnected;
     private bool _outputEnabled = false;
     private SourceParameters? _currentOutput;
-    
+
     // Reference to connected measurement device for simulation
     private MockMeasurementDevice? _connectedMeter;
-    
+
     public string Id { get; }
     public string Name { get; }
     public string DeviceType => "MockCalibrator";
     public DeviceStatus Status => _status;
-    
+
     public int ResponseDelayMs { get; set; } = 50;
-    
+
     public MockSourceDevice(string id, string name, ILogService? logService = null)
     {
         Id = id;
         Name = name;
         _log = logService;
     }
-    
+
     /// <summary>
     /// Connect a measurement device for simulation purposes.
     /// When output is set, the meter will "see" this value.
@@ -40,32 +40,32 @@ public class MockSourceDevice : ISourceDevice
     {
         _connectedMeter = meter;
     }
-    
+
     public async Task<bool> ConnectAsync()
     {
         _status = DeviceStatus.Connecting;
         _log.Info($"Connecting to {Name}...", Id);
-        
+
         await Task.Delay(500);
-        
+
         _status = DeviceStatus.Connected;
         _log.Info($"Connected to {Name}", Id);
         return true;
     }
-    
+
     public async Task DisconnectAsync()
     {
         if (_outputEnabled)
         {
             await DisableOutputAsync();
         }
-        
+
         _log.Info($"Disconnecting from {Name}...", Id);
         await Task.Delay(100);
         _status = DeviceStatus.Disconnected;
         _log.Info($"Disconnected from {Name}", Id);
     }
-    
+
     public async Task ResetAsync()
     {
         _log.Info($"Resetting {Name}...", Id);
@@ -74,33 +74,33 @@ public class MockSourceDevice : ISourceDevice
         await Task.Delay(200);
         _log.Info($"{Name} reset complete", Id);
     }
-    
+
     public Task<string> GetIdentificationAsync()
     {
         return Task.FromResult($"MOCK,{DeviceType},{Id},1.0");
     }
-    
+
     public async Task SetOutputAsync(SourceParameters parameters)
     {
         if (_status != DeviceStatus.Connected)
         {
             throw new InvalidOperationException("Device not connected");
         }
-        
+
         _status = DeviceStatus.Busy;
         _log.Info($"Setting output: {parameters.Value} {parameters.Unit} ({parameters.Type})", Id);
-        
+
         await Task.Delay(ResponseDelayMs);
-        
+
         _currentOutput = parameters;
-        
+
         // Update connected meter with the new value
         _connectedMeter?.SetExpectedSourceValue(parameters.Value, parameters.Unit);
-        
+
         _status = DeviceStatus.Connected;
         _log.Debug($"Output set to {parameters.Value} {parameters.Unit}", Id);
     }
-    
+
     public async Task EnableOutputAsync()
     {
         if (_currentOutput == null)
@@ -108,32 +108,32 @@ public class MockSourceDevice : ISourceDevice
             _log.Warning("No output configured, cannot enable", Id);
             return;
         }
-        
+
         _log.Info("Enabling output", Id);
         await Task.Delay(ResponseDelayMs);
         _outputEnabled = true;
-        
+
         // Notify the connected meter
         if (_currentOutput != null)
         {
             _connectedMeter?.SetExpectedSourceValue(_currentOutput.Value, _currentOutput.Unit);
         }
-        
+
         _log.Info($"Output enabled: {_currentOutput?.Value} {_currentOutput?.Unit}", Id);
     }
-    
+
     public async Task DisableOutputAsync()
     {
         _log.Info("Disabling output", Id);
         await Task.Delay(ResponseDelayMs);
         _outputEnabled = false;
-        
+
         // Set meter to zero when output disabled
         _connectedMeter?.SetExpectedSourceValue(0, _currentOutput?.Unit ?? "V");
-        
+
         _log.Info("Output disabled", Id);
     }
-    
+
     public Task<SourceStatus> GetOutputStatusAsync()
     {
         return Task.FromResult(new SourceStatus
@@ -145,7 +145,7 @@ public class MockSourceDevice : ISourceDevice
             OverloadProtection = false
         });
     }
-    
+
     public Task<IEnumerable<SourceCapability>> GetCapabilitiesAsync()
     {
         var capabilities = new[]
@@ -161,7 +161,7 @@ public class MockSourceDevice : ISourceDevice
             // Resistance
             new SourceCapability { Type = SourceType.Resistance, MinValue = 0, MaxValue = 100000000, Resolution = 0.001, Unit = "Ω" }
         };
-        
+
         return Task.FromResult<IEnumerable<SourceCapability>>(capabilities);
     }
 }

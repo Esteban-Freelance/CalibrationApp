@@ -1,9 +1,9 @@
-using CalibrationApp.Logging;
-using CalibrationApp.Models;
+using CalibrationDevices.Logging;
+using CalibriCore.Models;
 using CalibrationDevices.Interfaces;
 using CalibrationDevices.Logging;
 
-namespace CalibrationApp.Services;
+namespace CalibriCore.Services;
 
 /// <summary>
 /// Executes calibration recipes step by step.
@@ -14,24 +14,24 @@ public class RecipeRunner
     private readonly ILogService _log;
     private CancellationTokenSource? _cts;
     private bool _isPaused;
-    
+
     public Recipe? CurrentRecipe { get; private set; }
     public int CurrentStepIndex { get; private set; } = -1;
     public RecipeRunnerState State { get; private set; } = RecipeRunnerState.Idle;
     public CalibrationReport? Report { get; private set; }
-    
+
     public event EventHandler<RecipeStep>? StepStarted;
     public event EventHandler<RecipeStep>? StepCompleted;
     public event EventHandler<FailedStepEventArgs>? StepFailed;
     public event EventHandler<RecipeRunnerState>? StateChanged;
     public event EventHandler<CalibrationReport>? RecipeCompleted;
-    
+
     public RecipeRunner(TestBenchService testBench, ILogService? logService = null)
     {
         _testBench = testBench;
-        _log = logService ?? LogService.Instance;
+        _log = logService ?? throw new ArgumentNullException(nameof(logService));
     }
-    
+
     public async Task<bool> RunAsync(Recipe recipe, string operatorName = "")
     {
         if (State == RecipeRunnerState.Running)
@@ -39,19 +39,19 @@ public class RecipeRunner
             _log.Warning("Recipe already running");
             return false;
         }
-        
+
         // Validate requirements
         if (!_testBench.HasRequiredRoles(recipe.RequiredRoles))
         {
             _log.Error("Test bench missing required device roles");
             return false;
         }
-        
+
         CurrentRecipe = recipe;
         CurrentStepIndex = -1;
         _cts = new CancellationTokenSource();
         _isPaused = false;
-        
+
         // Initialize report
         Report = new CalibrationReport
         {
@@ -62,7 +62,7 @@ public class RecipeRunner
             OperatorName = operatorName,
             OverallResult = CalibrationResult.InProgress
         };
-        
+
         // Add device info to report
         foreach (var (role, device) in _testBench.GetAllDevices())
         {
@@ -74,10 +74,10 @@ public class RecipeRunner
                 DeviceType = device.DeviceType
             });
         }
-        
+
         SetState(RecipeRunnerState.Running);
         _log.Info($"Starting recipe: {recipe.Name}");
-        
+
         try
         {
             // Reset all step statuses
@@ -86,7 +86,7 @@ public class RecipeRunner
                 step.Status = StepStatus.Pending;
                 step.Result = null;
             }
-            
+
             for (int i = 0; i < recipe.Steps.Count; i++)
             {
                 if (_cts.Token.IsCancellationRequested)
@@ -95,22 +95,22 @@ public class RecipeRunner
                     Report.OverallResult = CalibrationResult.Aborted;
                     break;
                 }
-                
+
                 // Handle pause
                 while (_isPaused && !_cts.Token.IsCancellationRequested)
                 {
                     await Task.Delay(100, _cts.Token);
                 }
-                
+
                 CurrentStepIndex = i;
                 var step = recipe.Steps[i];
-                
+
                 var success = await ExecuteStepAsync(step);
-                
+
                 if (!success)
                 {
                     var action = await HandleFailedStepAsync(step);
-                    
+
                     switch (action)
                     {
                         case FailAction.Retry:
@@ -135,7 +135,7 @@ public class RecipeRunner
                     }
                 }
             }
-            
+
             if (State != RecipeRunnerState.Aborted)
             {
                 // Determine overall result
@@ -161,17 +161,17 @@ public class RecipeRunner
             Report.EndTime = DateTime.Now;
             RecipeCompleted?.Invoke(this, Report);
         }
-        
+
         return Report.OverallResult == CalibrationResult.Passed;
     }
-    
+
     private async Task<bool> ExecuteStepAsync(RecipeStep step)
     {
         step.Status = StepStatus.Running;
         StepStarted?.Invoke(this, step);
-        
+
         _log.Info($"Executing step {step.Order}: {step.Name} ({step.Type})");
-        
+
         try
         {
             StepResult result = step.Type switch
@@ -183,10 +183,10 @@ public class RecipeRunner
                 StepType.Message => await ExecuteMessageStepAsync(step),
                 _ => new StepResult { Passed = false, ErrorMessage = "Unknown step type" }
             };
-            
+
             step.Result = result;
             step.Status = result.Passed ? StepStatus.Passed : StepStatus.Failed;
-            
+
             // Add to report
             var (lower, upper) = step.Tolerance?.GetLimits() ?? (0, 0);
             Report?.StepReports.Add(new StepReport
@@ -204,9 +204,9 @@ public class RecipeRunner
                 Timestamp = result.Timestamp,
                 ErrorMessage = result.ErrorMessage
             });
-            
+
             StepCompleted?.Invoke(this, step);
-            
+
             if (result.Passed)
             {
                 _log.Info($"Step {step.Order} PASSED");
@@ -215,7 +215,7 @@ public class RecipeRunner
             {
                 _log.Warning($"Step {step.Order} FAILED: {result.ErrorMessage}");
             }
-            
+
             return result.Passed;
         }
         catch (Exception ex)
@@ -227,7 +227,7 @@ public class RecipeRunner
             return false;
         }
     }
-    
+
     private async Task<StepResult> ExecuteConfigureStepAsync(RecipeStep step)
     {
         var device = _testBench.GetDeviceByRole(step.DeviceRole ?? "");
@@ -235,7 +235,7 @@ public class RecipeRunner
         {
             return new StepResult { Passed = false, ErrorMessage = $"Device role not found: {step.DeviceRole}" };
         }
-        
+
         if (device is ISourceDevice source)
         {
             var parameters = new SourceParameters
@@ -244,7 +244,7 @@ public class RecipeRunner
                 Unit = step.Parameters?.Unit ?? "V",
                 Frequency = step.Parameters?.Frequency
             };
-            
+
             // Determine source type from parameters
             if (step.Parameters?.Voltage.HasValue == true)
             {
@@ -258,16 +258,16 @@ public class RecipeRunner
             {
                 parameters.Type = SourceType.Resistance;
             }
-            
+
             await source.SetOutputAsync(parameters);
             await source.EnableOutputAsync();
-            
+
             return new StepResult { Passed = true };
         }
-        
+
         return new StepResult { Passed = false, ErrorMessage = "Device is not a source" };
     }
-    
+
     private async Task<StepResult> ExecuteMeasurementStepAsync(RecipeStep step)
     {
         var device = _testBench.GetDeviceByRole(step.DeviceRole ?? "");
@@ -275,35 +275,35 @@ public class RecipeRunner
         {
             return new StepResult { Passed = false, ErrorMessage = $"Device role not found: {step.DeviceRole}" };
         }
-        
+
         if (device is IMeasurementDevice meter)
         {
             var measurementType = ParseMeasurementType(step.Parameters?.MeasurementType);
-            
+
             var parameters = new MeasurementParameters
             {
                 Type = measurementType,
                 Range = step.Parameters?.Range ?? 0,
                 Unit = step.Parameters?.Unit ?? "V"
             };
-            
+
             var measurement = await meter.MeasureAsync(parameters);
-            
+
             if (!measurement.IsValid)
             {
-                return new StepResult 
-                { 
-                    Passed = false, 
-                    ErrorMessage = measurement.ErrorMessage ?? "Invalid measurement" 
+                return new StepResult
+                {
+                    Passed = false,
+                    ErrorMessage = measurement.ErrorMessage ?? "Invalid measurement"
                 };
             }
-            
+
             // Check tolerance if defined
             if (step.Tolerance != null)
             {
                 var passed = step.Tolerance.IsWithinTolerance(measurement.Value);
                 var deviation = measurement.Value - step.Tolerance.Nominal;
-                
+
                 return new StepResult
                 {
                     Passed = passed,
@@ -313,7 +313,7 @@ public class RecipeRunner
                     ErrorMessage = passed ? null : $"Out of tolerance: {measurement.Value:F6} {measurement.Unit}"
                 };
             }
-            
+
             return new StepResult
             {
                 Passed = true,
@@ -321,10 +321,10 @@ public class RecipeRunner
                 Unit = measurement.Unit
             };
         }
-        
+
         return new StepResult { Passed = false, ErrorMessage = "Device is not a measurement device" };
     }
-    
+
     private async Task<StepResult> ExecuteWaitStepAsync(RecipeStep step)
     {
         var duration = step.DurationMs ?? 1000;
@@ -332,7 +332,7 @@ public class RecipeRunner
         await Task.Delay(duration, _cts?.Token ?? CancellationToken.None);
         return new StepResult { Passed = true };
     }
-    
+
     private async Task<StepResult> ExecuteSwitchStepAsync(RecipeStep step)
     {
         var device = _testBench.GetDeviceByRole(step.DeviceRole ?? "SwitchMatrix");
@@ -340,7 +340,7 @@ public class RecipeRunner
         {
             return new StepResult { Passed = false, ErrorMessage = $"Switch device not found" };
         }
-        
+
         if (device is ISwitchDevice switchDevice)
         {
             if (step.Parameters?.RouteName != null)
@@ -351,24 +351,24 @@ public class RecipeRunner
             {
                 await switchDevice.SetChannelAsync(step.Parameters.Channel.Value);
             }
-            
+
             return new StepResult { Passed = true };
         }
-        
+
         return new StepResult { Passed = false, ErrorMessage = "Device is not a switch" };
     }
-    
+
     private Task<StepResult> ExecuteMessageStepAsync(RecipeStep step)
     {
         _log.Info($"Message: {step.Name}");
         return Task.FromResult(new StepResult { Passed = true });
     }
-    
+
     private async Task<FailAction> HandleFailedStepAsync(RecipeStep step)
     {
         var args = new FailedStepEventArgs(step);
         StepFailed?.Invoke(this, args);
-        
+
         // Wait for user response if prompting
         if (step.OnFail == FailAction.Prompt)
         {
@@ -377,7 +377,7 @@ public class RecipeRunner
             await Task.Delay(100);
             return args.SelectedAction;
         }
-        
+
         return step.OnFail switch
         {
             FailAction.Retry => FailAction.Retry,
@@ -387,12 +387,12 @@ public class RecipeRunner
             _ => FailAction.Abort
         };
     }
-    
+
     private MeasurementType ParseMeasurementType(string? typeString)
     {
         if (string.IsNullOrEmpty(typeString))
             return MeasurementType.VoltageDC;
-        
+
         return typeString.ToLowerInvariant() switch
         {
             "voltagedc" or "vdc" => MeasurementType.VoltageDC,
@@ -404,7 +404,7 @@ public class RecipeRunner
             _ => MeasurementType.VoltageDC
         };
     }
-    
+
     public void Pause()
     {
         if (State == RecipeRunnerState.Running)
@@ -414,7 +414,7 @@ public class RecipeRunner
             _log.Info("Recipe paused");
         }
     }
-    
+
     public void Resume()
     {
         if (State == RecipeRunnerState.Paused)
@@ -424,13 +424,13 @@ public class RecipeRunner
             _log.Info("Recipe resumed");
         }
     }
-    
+
     public void Abort()
     {
         _log.Warning("Aborting recipe...");
         _cts?.Cancel();
     }
-    
+
     private void SetState(RecipeRunnerState newState)
     {
         State = newState;
@@ -452,7 +452,7 @@ public class FailedStepEventArgs : EventArgs
 {
     public RecipeStep Step { get; }
     public FailAction SelectedAction { get; set; } = FailAction.Abort;
-    
+
     public FailedStepEventArgs(RecipeStep step)
     {
         Step = step;
