@@ -113,9 +113,13 @@ public class HhMeasurementDevice : IMeasurementDevice, IDisposable
                 ranges.Add(new MeasurementRange { Name = "100V", MinValue = -100, MaxValue = 100, Resolution = 0.001 });
                 break;
 
-            case MeasurementType.Resistance:
-                ranges.Add(new MeasurementRange { Name = "1kΩ", MinValue = 0, MaxValue = 1000, Resolution = 0.1 });
-                ranges.Add(new MeasurementRange { Name = "10kΩ", MinValue = 0, MaxValue = 10000, Resolution = 1 });
+            case MeasurementType.CurrentDC:
+                ranges.Add(new MeasurementRange { Name = "100mA", MinValue = -0.1, MaxValue = 0.1, Resolution = 0.000001 });
+                ranges.Add(new MeasurementRange { Name = "1A", MinValue = -1, MaxValue = 1, Resolution = 0.00001 });
+                break;
+
+            case MeasurementType.CurrentShunt:
+                ranges.Add(new MeasurementRange { Name = "Auto", MinValue = 0, MaxValue = 10, Resolution = 0.000001 });
                 break;
 
             default:
@@ -142,13 +146,8 @@ public class HhMeasurementDevice : IMeasurementDevice, IDisposable
         return type switch
         {
             MeasurementType.VoltageDC => "MEAS:VOLT:DC?",
-            MeasurementType.VoltageAC => "MEAS:VOLT:AC?",
             MeasurementType.CurrentDC => "MEAS:CURR:DC?",
-            MeasurementType.CurrentAC => "MEAS:CURR:AC?",
-            MeasurementType.Resistance => "MEAS:RES?",
-            MeasurementType.Frequency => "MEAS:FREQ?",
-            MeasurementType.Temperature => "MEAS:TEMP?",
-            MeasurementType.Capacitance => "MEAS:CAP?",
+            MeasurementType.CurrentShunt => "MEAS:CURR:DC?",
             _ => throw new NotSupportedException()
         };
     }
@@ -158,13 +157,8 @@ public class HhMeasurementDevice : IMeasurementDevice, IDisposable
         return type switch
         {
             MeasurementType.VoltageDC => $"VOLT:RANG {range}",
-            MeasurementType.VoltageAC => $"CONF:VOLT:AC {range}",
             MeasurementType.CurrentDC => $"CURR:RANG {range}",
-            MeasurementType.CurrentAC => $"CONF:CURR:AC {range}",
-            MeasurementType.Resistance => $"CONF:RES {range}",
-            MeasurementType.Frequency => "CONF:FREQ",
-            MeasurementType.Temperature => "CONF:TEMP",
-            MeasurementType.Capacitance => "CONF:CAP",
+            MeasurementType.CurrentShunt => "CURR:RANG:AUTO ON",
             _ => throw new NotSupportedException()
         };
     }

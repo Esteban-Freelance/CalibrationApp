@@ -41,12 +41,6 @@ public class MeasurementRange
 public enum MeasurementType
 {
     VoltageDC,
-    VoltageAC,
     CurrentDC,
-    CurrentAC,
-    Resistance,
-    Frequency,
-    Temperature,
-    Capacitance,
     CurrentShunt
 }

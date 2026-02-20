@@ -240,23 +240,18 @@ public class RecipeRunner
         {
             var parameters = new SourceParameters
             {
-                Value = step.Parameters?.Voltage ?? step.Parameters?.Current ?? step.Parameters?.Resistance ?? 0,
-                Unit = step.Parameters?.Unit ?? "V",
-                Frequency = step.Parameters?.Frequency
+                Value = step.Parameters?.Voltage ?? step.Parameters?.Current ?? 0,
+                Unit = step.Parameters?.Unit ?? "V"
             };
 
             // Determine source type from parameters
             if (step.Parameters?.Voltage.HasValue == true)
             {
-                parameters.Type = step.Parameters.Frequency.HasValue ? SourceType.VoltageAC : SourceType.VoltageDC;
+                parameters.Type = SourceType.VoltageDC;
             }
             else if (step.Parameters?.Current.HasValue == true)
             {
-                parameters.Type = step.Parameters.Frequency.HasValue ? SourceType.CurrentAC : SourceType.CurrentDC;
-            }
-            else if (step.Parameters?.Resistance.HasValue == true)
-            {
-                parameters.Type = SourceType.Resistance;
+                parameters.Type = SourceType.CurrentDC;
             }
 
             await source.SetOutputAsync(parameters);
@@ -396,11 +391,8 @@ public class RecipeRunner
         return typeString.ToLowerInvariant() switch
         {
             "voltagedc" or "vdc" => MeasurementType.VoltageDC,
-            "voltageac" or "vac" => MeasurementType.VoltageAC,
             "currentdc" or "idc" => MeasurementType.CurrentDC,
-            "currentac" or "iac" => MeasurementType.CurrentAC,
-            "resistance" or "ohm" => MeasurementType.Resistance,
-            "frequency" or "freq" => MeasurementType.Frequency,
+            "currentshunt" or "shunt" => MeasurementType.CurrentShunt,
             _ => MeasurementType.VoltageDC
         };
     }

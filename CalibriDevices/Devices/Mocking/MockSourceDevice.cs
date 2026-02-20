@@ -152,14 +152,10 @@ public class MockSourceDevice : ISourceDevice
         {
             // DC Voltage
             new SourceCapability { Type = SourceType.VoltageDC, MinValue = -1100, MaxValue = 1100, Resolution = 0.000001, Unit = "V" },
-            // AC Voltage
-            new SourceCapability { Type = SourceType.VoltageAC, MinValue = 0, MaxValue = 1100, Resolution = 0.000001, Unit = "V" },
             // DC Current
             new SourceCapability { Type = SourceType.CurrentDC, MinValue = -11, MaxValue = 11, Resolution = 0.0000001, Unit = "A" },
-            // AC Current
-            new SourceCapability { Type = SourceType.CurrentAC, MinValue = 0, MaxValue = 11, Resolution = 0.0000001, Unit = "A" },
-            // Resistance
-            new SourceCapability { Type = SourceType.Resistance, MinValue = 0, MaxValue = 100000000, Resolution = 0.001, Unit = "Ω" }
+            // High Voltage
+            new SourceCapability { Type = SourceType.HighVoltage, MinValue = 0, MaxValue = 10000, Resolution = 0.001, Unit = "V" }
         };
 
         return Task.FromResult<IEnumerable<SourceCapability>>(capabilities);

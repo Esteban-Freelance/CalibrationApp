@@ -17,7 +17,6 @@ public class SourceParameters
     public SourceType Type { get; set; }
     public double Value { get; set; }
     public string Unit { get; set; } = string.Empty;
-    public double? Frequency { get; set; } // For AC sources
     public double? CurrentLimit { get; set; } // For voltage sources
     public double? VoltageLimit { get; set; } // For current sources
 }
@@ -43,10 +42,6 @@ public class SourceCapability
 public enum SourceType
 {
     VoltageDC,
-    VoltageAC,
     CurrentDC,
-    CurrentAC,
-    Resistance,
-    Frequency,
     HighVoltage
 }
