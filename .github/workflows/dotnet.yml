@@ -22,8 +22,8 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     
-    - name: Build
-      run: dotnet build --no-restore
+    - name: Build (cross-platform only)
+      run: dotnet build CalibriCore CalibriDevices NetworkScanner CalibriConsole CalibriTests --no-restore
     
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test CalibriTests --no-build --verbosity normal
