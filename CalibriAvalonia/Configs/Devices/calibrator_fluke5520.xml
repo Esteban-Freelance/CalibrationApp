@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Device id="calibrator_001">
+    <Type>Fluke5520A</Type>
+    <Driver>MockCalibrator</Driver>
+    <Name>Fluke 5520A Calibrator</Name>
+    <Connection type="GPIB">
+        <Address>5</Address>
+        <Board>0</Board>
+        <Timeout>5000</Timeout>
+    </Connection>
+</Device>

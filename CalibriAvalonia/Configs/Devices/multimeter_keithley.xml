@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Device id="multimeter_001">
+    <Type>Keithley2000</Type>
+    <Driver>MockMultimeter</Driver>
+    <n>Keithley 2000 Multimeter</n>
+    <Connection type="GPIB">
+        <Address>12</Address>
+        <Board>0</Board>
+        <Timeout>5000</Timeout>
+    </Connection>
+</Device>
