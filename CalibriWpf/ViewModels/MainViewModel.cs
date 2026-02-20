@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CalibrationApp.Logging;
 using CalibriCore.Models;
 using CalibriCore.Services;
 using CalibrationDevices.Interfaces;
@@ -59,13 +58,13 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private CalibrationResult _overallResult = CalibrationResult.NotStarted;
     
-    public ObservableCollection<LogEntry> LogEntries => LogService.Instance.LogEntries;
+    public ObservableCollection<LogEntry> LogEntries => ConsoleLogService.Instance.LogEntries;
     
     private List<DeviceConfig> _deviceConfigs = new();
     
     public MainViewModel()
     {
-        _log = LogService.Instance;
+        _log = ConsoleLogService.Instance;
         
         var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Configs");
         _configService = new ConfigurationService(configPath, _log);

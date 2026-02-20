@@ -31,6 +31,39 @@ public enum LogLevel
     Error
 }
 
+/// <summary>
+/// Simple console/logging implementation of ILogService.
+/// </summary>
+public class ConsoleLogService : ILogService
+{
+    private static readonly Lazy<ConsoleLogService> _instance = new(() => new ConsoleLogService());
+    public static ConsoleLogService Instance => _instance.Value;
+    
+    public ObservableCollection<LogEntry> LogEntries { get; } = new();
+    
+    public void Log(LogLevel level, string message, string? source = null)
+    {
+        var entry = new LogEntry
+        {
+            Timestamp = DateTime.Now,
+            Level = level,
+            Message = message,
+            Source = source
+        };
+        
+        LogEntries.Add(entry);
+        
+        // Also write to console
+        Console.WriteLine(entry.FormattedMessage);
+    }
+    
+    public void Info(string message, string? source = null) => Log(LogLevel.Info, message, source);
+    public void Warning(string message, string? source = null) => Log(LogLevel.Warning, message, source);
+    public void Error(string message, string? source = null) => Log(LogLevel.Error, message, source);
+    public void Debug(string message, string? source = null) => Log(LogLevel.Debug, message, source);
+    public void Clear() => LogEntries.Clear();
+}
+
 public class NullLogService : ILogService
 {
     public static NullLogService Instance { get; } = new();
