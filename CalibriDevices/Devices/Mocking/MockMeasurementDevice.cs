@@ -139,13 +139,9 @@ public class MockMeasurementDevice : IMeasurementDevice
                 new MeasurementRange { Name = "200mA", MinValue = -0.2, MaxValue = 0.2, Resolution = 0.0001 },
                 new MeasurementRange { Name = "10A", MinValue = -10, MaxValue = 10, Resolution = 0.01 }
             },
-            MeasurementType.Resistance => new[]
+            MeasurementType.CurrentShunt => new[]
             {
-                new MeasurementRange { Name = "200Ω", MinValue = 0, MaxValue = 200, Resolution = 0.01 },
-                new MeasurementRange { Name = "2kΩ", MinValue = 0, MaxValue = 2000, Resolution = 0.1 },
-                new MeasurementRange { Name = "20kΩ", MinValue = 0, MaxValue = 20000, Resolution = 1 },
-                new MeasurementRange { Name = "200kΩ", MinValue = 0, MaxValue = 200000, Resolution = 10 },
-                new MeasurementRange { Name = "2MΩ", MinValue = 0, MaxValue = 2000000, Resolution = 100 }
+                new MeasurementRange { Name = "Auto", MinValue = 0, MaxValue = 10, Resolution = 0.000001 }
             },
             _ => Array.Empty<MeasurementRange>()
         };

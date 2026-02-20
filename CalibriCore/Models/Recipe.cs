@@ -67,12 +67,6 @@ public class StepParameters
     [XmlElement("Current")]
     public double? Current { get; set; }
 
-    [XmlElement("Resistance")]
-    public double? Resistance { get; set; }
-
-    [XmlElement("Frequency")]
-    public double? Frequency { get; set; }
-
     [XmlElement("Range")]
     public double? Range { get; set; }
 
