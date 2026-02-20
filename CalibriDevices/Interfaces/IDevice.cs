@@ -9,7 +9,7 @@ public interface IDevice
     string Name { get; }
     string DeviceType { get; }
     DeviceStatus Status { get; }
-    
+
     Task<bool> ConnectAsync();
     Task DisconnectAsync();
     Task ResetAsync();

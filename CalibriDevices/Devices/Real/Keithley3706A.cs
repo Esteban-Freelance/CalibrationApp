@@ -227,26 +227,26 @@ namespace CalibrationDevices.Devices.Real
                 // 3706A DC Voltage ranges
                 MeasurementType.VoltageDC =>
                 [
-                    new() { Name = "Auto",   MinValue = 0,      MaxValue = 300,     Resolution = 0 },
-                new() { Name = "100 mV",  MinValue = 0,      MaxValue = 0.1,     Resolution = 0.000001 },
-                new() { Name = "1 V",     MinValue = 0,      MaxValue = 1,       Resolution = 0.00001 },
-                new() { Name = "10 V",    MinValue = 0,      MaxValue = 10,      Resolution = 0.0001 },
-                new() { Name = "100 V",   MinValue = 0,      MaxValue = 100,     Resolution = 0.001 },
-                new() { Name = "300 V",   MinValue = 0,      MaxValue = 300,     Resolution = 0.01 }
+                    new() { Name = "Auto", MinValue = 0, MaxValue = 300, Resolution = 0 },
+                new() { Name = "100 mV", MinValue = 0, MaxValue = 0.1, Resolution = 0.000001 },
+                new() { Name = "1 V", MinValue = 0, MaxValue = 1, Resolution = 0.00001 },
+                new() { Name = "10 V", MinValue = 0, MaxValue = 10, Resolution = 0.0001 },
+                new() { Name = "100 V", MinValue = 0, MaxValue = 100, Resolution = 0.001 },
+                new() { Name = "300 V", MinValue = 0, MaxValue = 300, Resolution = 0.01 }
                 ],
 
                 // 3706A DC Current ranges
                 MeasurementType.CurrentDC =>
                 [
-                    new() { Name = "Auto",   MinValue = 0,       MaxValue = 3,       Resolution = 0 },
-                new() { Name = "1 µA",   MinValue = 0,       MaxValue = 0.000001, Resolution = 0.000000001 },
-                new() { Name = "10 µA",  MinValue = 0,       MaxValue = 0.00001,  Resolution = 0.00000001 },
-                new() { Name = "100 µA", MinValue = 0,       MaxValue = 0.0001,   Resolution = 0.0000001 },
-                new() { Name = "1 mA",   MinValue = 0,       MaxValue = 0.001,    Resolution = 0.000001 },
-                new() { Name = "10 mA",  MinValue = 0,       MaxValue = 0.01,     Resolution = 0.00001 },
-                new() { Name = "100 mA", MinValue = 0,       MaxValue = 0.1,      Resolution = 0.0001 },
-                new() { Name = "1 A",    MinValue = 0,       MaxValue = 1,        Resolution = 0.001 },
-                new() { Name = "3 A",    MinValue = 0,       MaxValue = 3,        Resolution = 0.01 }
+                    new() { Name = "Auto", MinValue = 0, MaxValue = 3, Resolution = 0 },
+                new() { Name = "1 µA", MinValue = 0, MaxValue = 0.000001, Resolution = 0.000000001 },
+                new() { Name = "10 µA", MinValue = 0, MaxValue = 0.00001, Resolution = 0.00000001 },
+                new() { Name = "100 µA", MinValue = 0, MaxValue = 0.0001, Resolution = 0.0000001 },
+                new() { Name = "1 mA", MinValue = 0, MaxValue = 0.001, Resolution = 0.000001 },
+                new() { Name = "10 mA", MinValue = 0, MaxValue = 0.01, Resolution = 0.00001 },
+                new() { Name = "100 mA", MinValue = 0, MaxValue = 0.1, Resolution = 0.0001 },
+                new() { Name = "1 A", MinValue = 0, MaxValue = 1, Resolution = 0.001 },
+                new() { Name = "3 A", MinValue = 0, MaxValue = 3, Resolution = 0.01 }
                 ],
 
                 _ => throw new NotSupportedException($"{type} not supported")

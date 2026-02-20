@@ -15,24 +15,24 @@ public class MockMeasurementDevice : IMeasurementDevice
     private DeviceStatus _status = DeviceStatus.Disconnected;
     private double _lastSourceValue = 0;
     private string _lastSourceUnit = "V";
-    
+
     public string Id { get; }
     public string Name { get; }
     public string DeviceType => "MockMultimeter";
     public DeviceStatus Status => _status;
-    
+
     // Simulation parameters
     public double NoisePercent { get; set; } = 0.05; // 0.05% noise
     public int ResponseDelayMs { get; set; } = 100;
     public double AccuracyPercent { get; set; } = 0.01; // 0.01% accuracy
-    
+
     public MockMeasurementDevice(string id, string name, ILogService? logService = null)
     {
         Id = id;
         Name = name;
         _log = logService;
     }
-    
+
     /// <summary>
     /// Sets the expected source value for simulation purposes.
     /// In a real system, this would come from the actual calibrator.
@@ -42,19 +42,19 @@ public class MockMeasurementDevice : IMeasurementDevice
         _lastSourceValue = value;
         _lastSourceUnit = unit;
     }
-    
+
     public async Task<bool> ConnectAsync()
     {
         _status = DeviceStatus.Connecting;
         _log.Info($"Connecting to {Name}...", Id);
-        
+
         await Task.Delay(500); // Simulate connection time
-        
+
         _status = DeviceStatus.Connected;
         _log.Info($"Connected to {Name}", Id);
         return true;
     }
-    
+
     public async Task DisconnectAsync()
     {
         _log.Info($"Disconnecting from {Name}...", Id);
@@ -62,19 +62,19 @@ public class MockMeasurementDevice : IMeasurementDevice
         _status = DeviceStatus.Disconnected;
         _log.Info($"Disconnected from {Name}", Id);
     }
-    
+
     public async Task ResetAsync()
     {
         _log.Info($"Resetting {Name}...", Id);
         await Task.Delay(200);
         _log.Info($"{Name} reset complete", Id);
     }
-    
+
     public Task<string> GetIdentificationAsync()
     {
         return Task.FromResult($"MOCK,{DeviceType},{Id},1.0");
     }
-    
+
     public async Task<MeasurementResult> MeasureAsync(MeasurementParameters parameters)
     {
         if (_status != DeviceStatus.Connected)
@@ -85,31 +85,31 @@ public class MockMeasurementDevice : IMeasurementDevice
                 ErrorMessage = "Device not connected"
             };
         }
-        
+
         _status = DeviceStatus.Busy;
         _log.Debug($"Measuring {parameters.Type} on range {parameters.Range} {parameters.Unit}", Id);
-        
+
         // Simulate settling time
         await Task.Delay(parameters.SettlingTime);
-        
+
         // Simulate measurement with noise
         double baseValue = _lastSourceValue;
-        
+
         // Add systematic error (accuracy)
         double systematicError = baseValue * (AccuracyPercent / 100.0) * (_random.NextDouble() - 0.5) * 2;
-        
+
         // Add random noise
         double noise = baseValue * (NoisePercent / 100.0) * (_random.NextDouble() - 0.5) * 2;
-        
+
         double measuredValue = baseValue + systematicError + noise;
-        
+
         // Simulate response delay
         await Task.Delay(ResponseDelayMs);
-        
+
         _status = DeviceStatus.Connected;
-        
+
         _log.Info($"Measured: {measuredValue:F6} {parameters.Unit}", Id);
-        
+
         return new MeasurementResult
         {
             Value = measuredValue,
@@ -118,7 +118,7 @@ public class MockMeasurementDevice : IMeasurementDevice
             IsValid = true
         };
     }
-    
+
     public Task<IEnumerable<MeasurementRange>> GetAvailableRangesAsync(MeasurementType type)
     {
         var ranges = type switch
@@ -149,10 +149,10 @@ public class MockMeasurementDevice : IMeasurementDevice
             },
             _ => Array.Empty<MeasurementRange>()
         };
-        
+
         return Task.FromResult<IEnumerable<MeasurementRange>>(ranges);
     }
-    
+
     public Task SetRangeAsync(MeasurementType type, MeasurementRange range)
     {
         _log.Debug($"Range set to {range.Name} for {type}", Id);

@@ -19,7 +19,7 @@ public class LogEntry
     public LogLevel Level { get; set; }
     public string Message { get; set; } = string.Empty;
     public string? Source { get; set; }
-    
+
     public string FormattedMessage => $"[{Timestamp:HH:mm:ss.fff}] [{Level}] {(Source != null ? $"[{Source}] " : "")}{Message}";
 }
 

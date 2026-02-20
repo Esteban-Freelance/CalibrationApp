@@ -16,7 +16,7 @@ namespace CalibrationDevices.Devices.Real
         // ──────────────────────────────────────────────
         private string _statusEndpoint = "/status.xml";
         private string _relayOnEndpoint = "/forms.htm?rel1=1";
-        
+
         private string _relayOffEndpoint = "/forms.htm?rel1=0";
 
         private static readonly string[] CandidateStatusEndpoints =
