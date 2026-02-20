@@ -19,11 +19,10 @@ jobs:
       with:
         dotnet-version: '8.0.x'
     
-    - name: Restore dependencies
-      run: dotnet restore CalibriCore CalibriDevices NetworkScanner CalibriConsole CalibriTests
-    
-    - name: Build (cross-platform only)
-      run: dotnet build CalibriCore CalibriDevices NetworkScanner CalibriConsole CalibriTests --no-restore
-    
-    - name: Test
-      run: dotnet test CalibriTests --no-build --verbosity normal
+    - name: Build and test cross-platform projects
+      run: |
+        dotnet build CalibriCore/CalibriCore.csproj
+        dotnet build CalibriDevices/CalibriDevices.csproj
+        dotnet build NetworkScanner/NetworkScanner.csproj
+        dotnet build CalibriConsole/CalibriConsole.csproj
+        dotnet test CalibriTests/CalibriTests.csproj --verbosity normal
