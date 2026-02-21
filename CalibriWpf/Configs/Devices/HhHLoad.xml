@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Device id="hhload_001">
-    <Type>H&amp;H ZS Lasten</Type>
+    <Type>hhload</Type>
     <Driver>HhMeasurementDevice</Driver>
     <Name>H&amp;H ZS Lasten (DUT)</Name>
     <Connection type="GPIB">
