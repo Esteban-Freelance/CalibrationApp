@@ -15,8 +15,8 @@ public class MockSourceDevice : ISourceDevice
     private bool _outputEnabled = false;
     private SourceParameters? _currentOutput;
 
-    // Reference to connected measurement device for simulation
-    private MockMeasurementDevice? _connectedMeter;
+    // Reference to connected measurement devices for simulation
+    private readonly List<MockMeasurementDevice> _connectedMeters = new();
 
     public string Id { get; }
     public string Name { get; }
@@ -38,7 +38,7 @@ public class MockSourceDevice : ISourceDevice
     /// </summary>
     public void ConnectMeter(MockMeasurementDevice meter)
     {
-        _connectedMeter = meter;
+        _connectedMeters.Add(meter);
     }
 
     public async Task<bool> ConnectAsync()
@@ -95,7 +95,8 @@ public class MockSourceDevice : ISourceDevice
         _currentOutput = parameters;
 
         // Update connected meter with the new value
-        _connectedMeter?.SetExpectedSourceValue(parameters.Value, parameters.Unit);
+        foreach (var meter in _connectedMeters)
+            meter.SetExpectedSourceValue(parameters.Value, parameters.Unit);
 
         _status = DeviceStatus.Connected;
         _log.Debug($"Output set to {parameters.Value} {parameters.Unit}", Id);
@@ -116,7 +117,8 @@ public class MockSourceDevice : ISourceDevice
         // Notify the connected meter
         if (_currentOutput != null)
         {
-            _connectedMeter?.SetExpectedSourceValue(_currentOutput.Value, _currentOutput.Unit);
+            foreach (var meter in _connectedMeters)
+                meter.SetExpectedSourceValue(_currentOutput.Value, _currentOutput.Unit);
         }
 
         _log.Info($"Output enabled: {_currentOutput?.Value} {_currentOutput?.Unit}", Id);
@@ -129,7 +131,8 @@ public class MockSourceDevice : ISourceDevice
         _outputEnabled = false;
 
         // Set meter to zero when output disabled
-        _connectedMeter?.SetExpectedSourceValue(0, _currentOutput?.Unit ?? "V");
+        foreach (var meter in _connectedMeters)
+            meter.SetExpectedSourceValue(0, _currentOutput?.Unit ?? "V");
 
         _log.Info("Output disabled", Id);
     }

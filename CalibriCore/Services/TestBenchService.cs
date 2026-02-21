@@ -65,20 +65,24 @@ public class TestBenchService
 
     private void WireMockDevices()
     {
-        // Connect calibrators to measurement devices for simulation
-        var calibrators = _devices.Values.OfType<MockSourceDevice>().ToList();
+        // Connect calibrators to ALL measurement devices for simulation
+        var sources = _devices.Values.OfType<MockSourceDevice>().ToList();
         var hvSources = _devices.Values.OfType<MockHighVoltageSource>().ToList();
         var meters = _devices.Values.OfType<MockMeasurementDevice>().ToList();
 
-        if (meters.Any())
+        // Connect each source to ALL meters
+        foreach (var source in sources)
         {
-            var meter = meters.First();
-            foreach (var calibrator in calibrators)
+            foreach (var meter in meters)
             {
-                calibrator.ConnectMeter(meter);
-                _log.Debug($"Wired {calibrator.Name} to {meter.Name}");
+                source.ConnectMeter(meter);
+                _log.Debug($"Wired {source.Name} to {meter.Name}");
             }
-            foreach (var hvSource in hvSources)
+        }
+
+        foreach (var hvSource in hvSources)
+        {
+            foreach (var meter in meters)
             {
                 hvSource.ConnectMeter(meter);
                 _log.Debug($"Wired {hvSource.Name} to {meter.Name}");

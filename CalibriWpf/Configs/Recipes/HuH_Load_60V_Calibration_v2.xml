@@ -25,15 +25,8 @@
       <Action>Reset</Action>
     </Step>
 
-    <Step type="Configure" order="3" name="Reset Reference (Keithley)">
-      <DeviceRole>Reference</DeviceRole>
-      <Action>Reset</Action>
-    </Step>
-
-    <Step type="Configure" order="4" name="Reset DUT (H&amp;H)">
-      <DeviceRole>DUT</DeviceRole>
-      <Action>Reset</Action>
-    </Step>
+    <!-- Reference and DUT are measurement devices - no need to reset them separately -->
+    <!-- Their readings are taken during Measurement steps -->
 
     <Step type="Wait" order="5" name="Settling after reset">
       <Duration>3000</Duration>
