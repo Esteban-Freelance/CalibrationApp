@@ -11,6 +11,7 @@ public class RecipeRunner
 {
     private readonly TestBenchService _testBench;
     private readonly ILogService _log;
+    private readonly ReportService? _reportService;
     private CancellationTokenSource? _cts;
     private bool _isPaused;
 
@@ -25,10 +26,11 @@ public class RecipeRunner
     public event EventHandler<RecipeRunnerState>? StateChanged;
     public event EventHandler<CalibrationReport>? RecipeCompleted;
 
-    public RecipeRunner(TestBenchService testBench, ILogService? logService = null)
+    public RecipeRunner(TestBenchService testBench, ILogService? logService = null, ReportService? reportService = null)
     {
         _testBench = testBench;
         _log = logService ?? throw new ArgumentNullException(nameof(logService));
+        _reportService = reportService;
     }
 
     public async Task<bool> RunAsync(Recipe recipe, string operatorName = "")
@@ -158,6 +160,10 @@ public class RecipeRunner
         finally
         {
             Report.EndTime = DateTime.Now;
+            
+            // Cache the report
+            _reportService?.SaveToCache(Report);
+            
             RecipeCompleted?.Invoke(this, Report);
         }
 
@@ -203,6 +209,9 @@ public class RecipeRunner
                 Timestamp = result.Timestamp,
                 ErrorMessage = result.ErrorMessage
             });
+
+            // Cache report after each step (real-time backup)
+            _reportService?.SaveToCache(Report!);
 
             StepCompleted?.Invoke(this, step);
 
