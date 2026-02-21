@@ -494,7 +494,7 @@ public class RecipeRunner
 
     private async Task<StepResult> ExecuteSwitchStepAsync(RecipeStep step)
     {
-        var device = _testBench.GetDeviceByRole(step.DeviceRole ?? "SwitchMatrix");
+        var device = _testBench.GetDeviceByRole(step.DeviceRole ?? "Relay");
         if (device == null)
         {
             return new StepResult { Passed = false, ErrorMessage = $"Switch device not found" };
