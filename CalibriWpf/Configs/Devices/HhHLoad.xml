@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Device id="hhload_001">
+    <Type>H&amp;H ZS Lasten</Type>
+    <Driver>HhMeasurementDevice</Driver>
+    <Name>H&amp;H ZS Lasten (DUT)</Name>
+    <Connection type="VISA">
+        <Address>192.168.178.31</Address>
+        <Port>5025</Port>
+        <Timeout>5000</Timeout>
+    </Connection>
+</Device>

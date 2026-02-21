@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Device id="keithley3706a_001">
+    <Type>Keithley3706A</Type>
+    <Driver>Keithley3706A</Driver>
+    <Name>Keithley 3706A Reference Multimeter</Name>
+    <Connection type="TCP">
+        <Address>192.168.178.30</Address>
+        <Port>5025</Port>
+        <Timeout>5000</Timeout>
+    </Connection>
+</Device>

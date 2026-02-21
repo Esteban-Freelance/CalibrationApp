@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Recipe id="HuH-Load-60V-Calibration" name="H&amp;H Load 60V DC Voltage Calibration (Reference+DUT)">
+  <Description>Calibration of Höcherl &amp; Hackl Electronic Load ZS 530-3. Uses Reference vs DUT mode - Keithley as Reference (Richtiger Wert), H&amp;H as DUT (Anzeige).</Description>
+  <Version>2.0</Version>
+  <Author>CalibrationApp</Author>
+  <CreatedDate>2026-02-21</CreatedDate>
+
+  <RequiredRoles>
+    <Role>Reference</Role>
+    <Role>DUT</Role>
+    <Role>PowerSource</Role>
+    <Role>SwitchMatrix</Role>
+  </RequiredRoles>
+
+  <Steps>
+
+    <!-- INITIALIZATION -->
+
+    <Step type="Message" order="1" name="Start H&amp;H Load Calibration">
+      <Description>Initialize calibration of Höcherl &amp; Hackl Electronic Load - DC Voltage</Description>
+    </Step>
+
+    <Step type="Configure" order="2" name="Reset Power Source">
+      <DeviceRole>PowerSource</DeviceRole>
+      <Action>Reset</Action>
+    </Step>
+
+    <Step type="Configure" order="3" name="Reset Reference (Keithley)">
+      <DeviceRole>Reference</DeviceRole>
+      <Action>Reset</Action>
+    </Step>
+
+    <Step type="Configure" order="4" name="Reset DUT (H&amp;H)">
+      <DeviceRole>DUT</DeviceRole>
+      <Action>Reset</Action>
+    </Step>
+
+    <Step type="Wait" order="5" name="Settling after reset">
+      <Duration>3000</Duration>
+    </Step>
+
+    <!-- ================================================================== -->
+    <!-- DC VOLTAGE 60V -->
+    <!-- ================================================================== -->
+
+    <Step type="Message" order="100" name="DC Voltage 60V - Begin">
+      <Description>Starting DC Voltage calibration, 60V range</Description>
+    </Step>
+
+    <!-- 0V DC -->
+    <Step type="Configure" order="101" name="Set Power Source 0V DC">
+      <DeviceRole>PowerSource</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <Voltage>0</Voltage>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+
+    <Step type="Wait" order="102" name="Settling 0V DC">
+      <Duration>2000</Duration>
+    </Step>
+
+    <!-- Calibration measurement: Reference + DUT -->
+    <Step type="Measurement" order="103" name="Calibrate 0V DC">
+      <Parameters>
+        <ReferenceDeviceRole>Reference</ReferenceDeviceRole>
+        <DUTDeviceRole>DUT</DUTDeviceRole>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <SampleCount>5</SampleCount>
+        <SettlingTimeMs>1000</SettlingTimeMs>
+      </Parameters>
+      <Tolerance>
+        <Nominal>0</Nominal>
+        <ErrorAbsolute>0.030</ErrorAbsolute>
+      </Tolerance>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 5V DC -->
+    <Step type="Configure" order="111" name="Set Power Source 5V DC">
+      <DeviceRole>PowerSource</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <Voltage>5</Voltage>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+
+    <Step type="Wait" order="112" name="Settling 5V DC">
+      <Duration>2000</Duration>
+    </Step>
+
+    <Step type="Measurement" order="113" name="Calibrate 5V DC">
+      <Parameters>
+        <ReferenceDeviceRole>Reference</ReferenceDeviceRole>
+        <DUTDeviceRole>DUT</DUTDeviceRole>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <SampleCount>5</SampleCount>
+        <SettlingTimeMs>1000</SettlingTimeMs>
+      </Parameters>
+      <Tolerance>
+        <Nominal>5.0</Nominal>
+        <ErrorPercent>0.20</ErrorPercent>
+      </Tolerance>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 10V DC -->
+    <Step type="Configure" order="121" name="Set Power Source 10V DC">
+      <DeviceRole>PowerSource</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <Voltage>10</Voltage>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+
+    <Step type="Wait" order="122" name="Settling 10V DC">
+      <Duration>2000</Duration>
+    </Step>
+
+    <Step type="Measurement" order="123" name="Calibrate 10V DC">
+      <Parameters>
+        <ReferenceDeviceRole>Reference</ReferenceDeviceRole>
+        <DUTDeviceRole>DUT</DUTDeviceRole>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <SampleCount>5</SampleCount>
+        <SettlingTimeMs>1000</SettlingTimeMs>
+      </Parameters>
+      <Tolerance>
+        <Nominal>10.0</Nominal>
+        <ErrorPercent>0.20</ErrorPercent>
+      </Tolerance>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 20V DC -->
+    <Step type="Configure" order="131" name="Set Power Source 20V DC">
+      <DeviceRole>PowerSource</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <Voltage>20</Voltage>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+
+    <Step type="Wait" order="132" name="Settling 20V DC">
+      <Duration>2000</Duration>
+    </Step>
+
+    <Step type="Measurement" order="133" name="Calibrate 20V DC">
+      <Parameters>
+        <ReferenceDeviceRole>Reference</ReferenceDeviceRole>
+        <DUTDeviceRole>DUT</DUTDeviceRole>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <SampleCount>5</SampleCount>
+        <SettlingTimeMs>1000</SettlingTimeMs>
+      </Parameters>
+      <Tolerance>
+        <Nominal>20.0</Nominal>
+        <ErrorPercent>0.20</ErrorPercent>
+      </Tolerance>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 30V DC -->
+    <Step type="Configure" order="141" name="Set Power Source 30V DC">
+      <DeviceRole>PowerSource</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <Voltage>30</Voltage>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+
+    <Step type="Wait" order="142" name="Settling 30V DC">
+      <Duration>2000</Duration>
+    </Step>
+
+    <Step type="Measurement" order="143" name="Calibrate 30V DC">
+      <Parameters>
+        <ReferenceDeviceRole>Reference</ReferenceDeviceRole>
+        <DUTDeviceRole>DUT</DUTDeviceRole>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <SampleCount>5</SampleCount>
+        <SettlingTimeMs>1000</SettlingTimeMs>
+      </Parameters>
+      <Tolerance>
+        <Nominal>30.0</Nominal>
+        <ErrorPercent>0.20</ErrorPercent>
+      </Tolerance>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 40V DC -->
+    <Step type="Configure" order="151" name="Set Power Source 40V DC">
+      <DeviceRole>PowerSource</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <Voltage>40</Voltage>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+
+    <Step type="Wait" order="152" name="Settling 40V DC">
+      <Duration>2000</Duration>
+    </Step>
+
+    <Step type="Measurement" order="153" name="Calibrate 40V DC">
+      <Parameters>
+        <ReferenceDeviceRole>Reference</ReferenceDeviceRole>
+        <DUTDeviceRole>DUT</DUTDeviceRole>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <SampleCount>5</SampleCount>
+        <SettlingTimeMs>1000</SettlingTimeMs>
+      </Parameters>
+      <Tolerance>
+        <Nominal>40.0</Nominal>
+        <ErrorPercent>0.20</ErrorPercent>
+      </Tolerance>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 50V DC -->
+    <Step type="Configure" order="161" name="Set Power Source 50V DC">
+      <DeviceRole>PowerSource</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <Voltage>50</Voltage>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+
+    <Step type="Wait" order="162" name="Settling 50V DC">
+      <Duration>2000</Duration>
+    </Step>
+
+    <Step type="Measurement" order="163" name="Calibrate 50V DC">
+      <Parameters>
+        <ReferenceDeviceRole>Reference</ReferenceDeviceRole>
+        <DUTDeviceRole>DUT</DUTDeviceRole>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <SampleCount>5</SampleCount>
+        <SettlingTimeMs>1000</SettlingTimeMs>
+      </Parameters>
+      <Tolerance>
+        <Nominal>50.0</Nominal>
+        <ErrorPercent>0.20</ErrorPercent>
+      </Tolerance>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- 60V DC -->
+    <Step type="Configure" order="171" name="Set Power Source 60V DC">
+      <DeviceRole>PowerSource</DeviceRole>
+      <Action>SetOutput</Action>
+      <Parameters>
+        <Voltage>60</Voltage>
+        <Unit>V</Unit>
+      </Parameters>
+    </Step>
+
+    <Step type="Wait" order="172" name="Settling 60V DC">
+      <Duration>2000</Duration>
+    </Step>
+
+    <Step type="Measurement" order="173" name="Calibrate 60V DC">
+      <Parameters>
+        <ReferenceDeviceRole>Reference</ReferenceDeviceRole>
+        <DUTDeviceRole>DUT</DUTDeviceRole>
+        <MeasurementType>VoltageDC</MeasurementType>
+        <Range>60</Range>
+        <Unit>V</Unit>
+        <SampleCount>5</SampleCount>
+        <SettlingTimeMs>1000</SettlingTimeMs>
+      </Parameters>
+      <Tolerance>
+        <Nominal>60.0</Nominal>
+        <ErrorPercent>0.20</ErrorPercent>
+      </Tolerance>
+      <OnFail>Prompt</OnFail>
+    </Step>
+
+    <!-- SHUTDOWN -->
+
+    <Step type="Message" order="900" name="Calibration Complete">
+      <Description>Calibration finished - turning off outputs</Description>
+    </Step>
+
+    <Step type="Configure" order="901" name="Power Source Off">
+      <DeviceRole>PowerSource</DeviceRole>
+      <Action>DisableOutput</Action>
+    </Step>
+
+    <Step type="Message" order="902" name="Done">
+      <Description>Calibration procedure completed</Description>
+    </Step>
+
+  </Steps>
+</Recipe>
