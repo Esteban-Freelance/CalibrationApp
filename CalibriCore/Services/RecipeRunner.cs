@@ -265,6 +265,15 @@ public class RecipeRunner
 
     private async Task<StepResult> ExecuteMeasurementStepAsync(RecipeStep step)
     {
+        var p = step.Parameters;
+
+        // Calibration mode: measure both Reference and DUT
+        if (!string.IsNullOrEmpty(p?.ReferenceDeviceRole) && !string.IsNullOrEmpty(p?.DUTDeviceRole))
+        {
+            return await ExecuteCalibrationMeasurementAsync(step);
+        }
+
+        // Single device measurement (legacy mode)
         var device = _testBench.GetDeviceByRole(step.DeviceRole ?? "");
         if (device == null)
         {
@@ -318,6 +327,162 @@ public class RecipeRunner
         }
 
         return new StepResult { Passed = false, ErrorMessage = "Device is not a measurement device" };
+    }
+
+    /// <summary>
+    /// Execute a calibration measurement: measure Reference (e.g., Keithley) then DUT (e.g., H&H).
+    /// Compares the two values and checks against tolerance.
+    /// </summary>
+    private async Task<StepResult> ExecuteCalibrationMeasurementAsync(RecipeStep step)
+    {
+        var p = step.Parameters!;
+        var refRole = p.ReferenceDeviceRole!;
+        var dutRole = p.DUTDeviceRole!;
+
+        _log.Debug($"Calibration measurement: Reference={refRole}, DUT={dutRole}");
+
+        // 1. Get reference device (e.g., Keithley as "Richtiger Wert")
+        var refDevice = _testBench.GetDeviceByRole(refRole);
+        if (refDevice is not IMeasurementDevice refMeter)
+        {
+            return new StepResult { Passed = false, ErrorMessage = $"Reference device not found or not a meter: {refRole}" };
+        }
+
+        // 2. Get DUT device (e.g., H&H as "Anzeige")
+        var dutDevice = _testBench.GetDeviceByRole(dutRole);
+        if (dutDevice is not IMeasurementDevice dutMeter)
+        {
+            return new StepResult { Passed = false, ErrorMessage = $"DUT device not found or not a meter: {dutRole}" };
+        }
+
+        // 3. Configure shunt if specified (for current measurements)
+        if (p.ShuntResistance.HasValue)
+        {
+            _log.Debug($"Using shunt: {p.ShuntResistance} Ω");
+        }
+
+        // 4. Take multiple samples and average
+        var sampleCount = Math.Max(1, p.SampleCount);
+        var settlingTimeMs = p.SettlingTimeMs;
+
+        // Measure Reference
+        var refMeasurements = new List<double>();
+        var refMeasurementType = ParseMeasurementType(p.MeasurementType);
+
+        for (int i = 0; i < sampleCount; i++)
+        {
+            if (settlingTimeMs > 0 && i > 0)
+                await Task.Delay(settlingTimeMs);
+
+            var m = await refMeter.MeasureAsync(new MeasurementParameters
+            {
+                Type = refMeasurementType,
+                Range = p.Range ?? 0,
+                Unit = p.Unit
+            });
+
+            if (!m.IsValid)
+            {
+                return new StepResult { Passed = false, ErrorMessage = $"Reference measurement failed: {m.ErrorMessage}" };
+            }
+            refMeasurements.Add(m.Value);
+        }
+
+        var refValue = refMeasurements.Average();
+        var refUnit = p.Unit;
+
+        // Small settling time between reference and DUT measurement
+        await Task.Delay(50);
+
+        // Measure DUT
+        var dutMeasurements = new List<double>();
+        for (int i = 0; i < sampleCount; i++)
+        {
+            if (settlingTimeMs > 0 && i > 0)
+                await Task.Delay(settlingTimeMs);
+
+            var m = await dutMeter.MeasureAsync(new MeasurementParameters
+            {
+                Type = refMeasurementType,
+                Range = p.Range ?? 0,
+                Unit = p.Unit
+            });
+
+            if (!m.IsValid)
+            {
+                return new StepResult { Passed = false, ErrorMessage = $"DUT measurement failed: {m.ErrorMessage}" };
+            }
+            dutMeasurements.Add(m.Value);
+        }
+
+        var dutValue = dutMeasurements.Average();
+        var dutUnit = p.Unit;
+
+        // 5. Calculate deviation
+        double? deviation = null;
+        if (refValue != 0)
+        {
+            deviation = ((dutValue - refValue) / refValue) * 100.0; // Percentage
+        }
+
+        // 6. Check tolerance
+        bool passed = true;
+        string? errorMessage = null;
+        bool isWarning = false;
+
+        if (step.Tolerance != null)
+        {
+            passed = step.Tolerance.IsWithinTolerance(dutValue);
+            
+            if (!passed)
+            {
+                errorMessage = $"DUT {dutValue:F6} {dutUnit} out of tolerance (ref: {refValue:F6} {refUnit})";
+            }
+            else if (deviation.HasValue)
+            {
+                // Warn if within tolerance but >70% of limit
+                var (lower, upper) = step.Tolerance.GetLimits();
+                var toleranceRange = upper - lower;
+                var usedRange = Math.Max(dutValue - lower, upper - dutValue);
+                if (toleranceRange > 0 && usedRange > toleranceRange * 0.7)
+                {
+                    isWarning = true;
+                    _log.Warning($"Step {step.Order} at {usedRange/toleranceRange*100:F1}% of tolerance");
+                }
+            }
+        }
+
+        // 7. Calculate uncertainty (simplified)
+        double? uncertainty = null;
+        if (refMeasurements.Count > 1)
+        {
+            var stdDev = CalculateStdDev(refMeasurements);
+            uncertainty = stdDev / Math.Sqrt(refMeasurements.Count) * 2; // Expanded uncertainty (k=2)
+        }
+
+        _log.Info($"Calibration: Reference={refValue:F6} {refUnit}, DUT={dutValue:F6} {dutUnit}, Deviation={deviation:F4}%, Passed={passed}");
+
+        return new StepResult
+        {
+            Passed = passed,
+            MeasuredValue = dutValue,
+            Unit = dutUnit,
+            ReferenceValue = refValue,
+            DUTValue = dutValue,
+            Deviation = deviation,
+            Uncertainty = uncertainty,
+            IsWarning = isWarning,
+            ErrorMessage = errorMessage,
+            Timestamp = DateTime.Now
+        };
+    }
+
+    private static double CalculateStdDev(List<double> values)
+    {
+        if (values.Count <= 1) return 0;
+        var avg = values.Average();
+        var sumSquares = values.Sum(v => (v - avg) * (v - avg));
+        return Math.Sqrt(sumSquares / (values.Count - 1));
     }
 
     private async Task<StepResult> ExecuteWaitStepAsync(RecipeStep step)
