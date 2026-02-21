@@ -1,4 +1,6 @@
+using CalibriCore.Services;
 using CalibriCore.Models;
+using CalibrationDevices.Logging;
 using CalibriDevices.Devices;
 
 namespace CalibriConsole;
@@ -7,11 +9,207 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        Console.WriteLine("Calibri Console App");
-        Console.WriteLine("===================");
+        if (args.Length == 0)
+        {
+            PrintHelp();
+            return;
+        }
+
+        switch (args[0].ToLowerInvariant())
+        {
+            case "run":
+                await RunCalibrationAsync(args);
+                break;
+            case "list":
+                await ListConfigsAsync(args);
+                break;
+            case "scan":
+                await ScanNetworkAsync();
+                break;
+            case "help":
+            case "--help":
+            case "-h":
+                PrintHelp();
+                break;
+            default:
+                Console.WriteLine($"Unknown command: {args[0]}");
+                PrintHelp();
+                break;
+        }
+    }
+
+    static void PrintHelp()
+    {
+        Console.WriteLine("Calibri Console");
+        Console.WriteLine("===============");
+        Console.WriteLine();
+        Console.WriteLine("Commands:");
+        Console.WriteLine("  run          Run a calibration recipe");
+        Console.WriteLine("  list         List available configs");
+        Console.WriteLine("  scan         Scan network for devices");
+        Console.WriteLine("  help         Show this help");
+        Console.WriteLine();
+        Console.WriteLine("Run options:");
+        Console.WriteLine("  --testbench  Test bench name (default: MockRecept)");
+        Console.WriteLine("  --recipe     Recipe name (default: HuH_Load_60V_Calibration_v2)");
+        Console.WriteLine("  --config     Config path (default: CalibriWpf/Configs)");
+        Console.WriteLine("  --operator   Operator name (default: Console)");
+        Console.WriteLine();
+        Console.WriteLine("Examples:");
+        Console.WriteLine("  dotnet run --project CalibriConsole -- run");
+        Console.WriteLine("  dotnet run --project CalibriConsole -- run --testbench MockRecept --recipe HuH_Load_60V_Calibration_v2");
+    }
+
+    static async Task RunCalibrationAsync(string[] args)
+    {
+        var testbench = "MockRecept";
+        var recipe = "HuH_Load_60V_Calibration_v2";
+        var config = "CalibriWpf/Configs";
+        var op = "Console";
+
+        for (int i = 1; i < args.Length; i++)
+        {
+            if (args[i] == "--testbench" && i + 1 < args.Length) testbench = args[++i];
+            else if (args[i] == "--recipe" && i + 1 < args.Length) recipe = args[++i];
+            else if (args[i] == "--config" && i + 1 < args.Length) config = args[++i];
+            else if (args[i] == "--operator" && i + 1 < args.Length) op = args[++i];
+        }
+
+        var log = NullLogService.Instance;
+        var configPath = Path.GetFullPath(config);
+
+        Console.WriteLine($"Calibration Runner");
+        Console.WriteLine($"=================");
+        Console.WriteLine($"Config path: {configPath}");
+        Console.WriteLine($"Test bench:  {testbench}");
+        Console.WriteLine($"Recipe:      {recipe}");
+        Console.WriteLine($"Operator:    {op}");
+        Console.WriteLine();
+
+        var configService = new ConfigurationService(configPath, log);
         
-        // Example: Scan network
-        Console.WriteLine("\nScanning local network...");
+        Console.WriteLine("Loading configurations...");
+        var devices = configService.LoadDeviceConfigs().ToList();
+        var benches = configService.LoadTestBenchConfigs().ToList();
+        var recipes = configService.LoadRecipes().ToList();
+
+        Console.WriteLine($"  Loaded {devices.Count} devices");
+        Console.WriteLine($"  Loaded {benches.Count} test benches");
+        Console.WriteLine($"  Loaded {recipes.Count} recipes");
+
+        var benchConfig = benches.FirstOrDefault(b => b.Id.Equals(testbench, StringComparison.OrdinalIgnoreCase));
+        if (benchConfig == null)
+        {
+            Console.WriteLine($"ERROR: Test bench '{testbench}' not found!");
+            return;
+        }
+
+        var recipeConfig = recipes.FirstOrDefault(r => r.Id.Equals(recipe, StringComparison.OrdinalIgnoreCase));
+        if (recipeConfig == null)
+        {
+            Console.WriteLine($"ERROR: Recipe '{recipe}' not found!");
+            return;
+        }
+
+        Console.WriteLine();
+        Console.WriteLine($"Test bench: {benchConfig.Name}");
+        Console.WriteLine($"Recipe:     {recipeConfig.Name} ({recipeConfig.Steps.Count} steps)");
+        Console.WriteLine();
+
+        var testBench = new TestBenchService(log);
+        await testBench.InitializeAsync(benchConfig, devices);
+
+        Console.WriteLine("Connecting devices...");
+        await testBench.ConnectAllAsync();
+
+        foreach (var (role, device) in testBench.GetAllDevices())
+        {
+            Console.WriteLine($"  [{role}] {device.Name} - {device.Status}");
+        }
+        Console.WriteLine();
+
+        var runner = new RecipeRunner(testBench, log);
+        
+        runner.StepCompleted += (s, step) => 
+        {
+            var status = step.Status == StepStatus.Passed ? "✅" : "❌";
+            Console.WriteLine($"  Step {step.Order}: {step.Name} - {status}");
+        };
+        runner.RecipeCompleted += (s, report) =>
+        {
+            Console.WriteLine();
+            Console.WriteLine("=== CALIBRATION RESULT ===");
+            Console.WriteLine($"Overall: {report.OverallResult}");
+            Console.WriteLine($"Steps:   {report.StepReports.Count(r => r.Status == StepStatus.Passed)}/{report.StepReports.Count} passed");
+            
+            var failed = report.StepReports.Where(r => r.Status == StepStatus.Failed).ToList();
+            if (failed.Any())
+            {
+                Console.WriteLine("Failed steps:");
+                foreach (var f in failed)
+                {
+                    Console.WriteLine($"  - {f.StepName}: {f.ErrorMessage}");
+                }
+            }
+        };
+
+        Console.WriteLine("Running calibration...");
+        var success = await runner.RunAsync(recipeConfig, op);
+
+        Console.WriteLine();
+        Console.WriteLine("Disconnecting devices...");
+        await testBench.DisconnectAllAsync();
+
+        Console.WriteLine();
+        Console.WriteLine(success ? "✅ CALIBRATION PASSED" : "❌ CALIBRATION FAILED");
+    }
+
+    static async Task ListConfigsAsync(string[] args)
+    {
+        var config = "CalibriWpf/Configs";
+        
+        for (int i = 1; i < args.Length; i++)
+        {
+            if (args[i] == "--config" && i + 1 < args.Length) config = args[++i];
+        }
+
+        var log = NullLogService.Instance;
+        var configPath = Path.GetFullPath(config);
+
+        var configService = new ConfigurationService(configPath, log);
+
+        Console.WriteLine("Available Configurations");
+        Console.WriteLine("=======================");
+        Console.WriteLine();
+
+        var devices = configService.LoadDeviceConfigs().ToList();
+        var benches = configService.LoadTestBenchConfigs().ToList();
+        var recipes = configService.LoadRecipes().ToList();
+
+        Console.WriteLine($"Test Benches ({benches.Count}):");
+        foreach (var b in benches)
+        {
+            Console.WriteLine($"  - {b.Id}: {b.Name} ({b.Devices.Count} devices)");
+        }
+        Console.WriteLine();
+
+        Console.WriteLine($"Recipes ({recipes.Count}):");
+        foreach (var r in recipes)
+        {
+            Console.WriteLine($"  - {r.Id}: {r.Name} ({r.Steps.Count} steps)");
+        }
+        Console.WriteLine();
+
+        Console.WriteLine($"Devices ({devices.Count}):");
+        foreach (var d in devices)
+        {
+            Console.WriteLine($"  - {d.Id}: {d.Driver} ({d.Name})");
+        }
+    }
+
+    static async Task ScanNetworkAsync()
+    {
+        Console.WriteLine("Scanning local network...");
         var scanner = new NetworkScanner();
         var devices = await scanner.ScanLocalSubnetAsync();
         
@@ -24,16 +222,5 @@ class Program
         {
             Console.WriteLine($"  ... and {devices.Count - 10} more");
         }
-        
-        // Example: Using Recipe model (core)
-        Console.WriteLine("\nRecipe model available in CalibriCore!");
-        var recipe = new Recipe
-        {
-            Name = "Test Calibration",
-            Description = "A test recipe"
-        };
-        Console.WriteLine($"  Recipe: {recipe.Name}");
-        
-        Console.WriteLine("\nDone!");
     }
 }
