@@ -81,6 +81,26 @@ public class StepParameters
 
     [XmlElement("RouteName")]
     public string? RouteName { get; set; }
+    
+    // For calibration: reference device (Keithley)
+    [XmlElement("ReferenceDeviceRole")]
+    public string? ReferenceDeviceRole { get; set; }
+    
+    // For calibration: DUT device (H&H)
+    [XmlElement("DUTDeviceRole")]
+    public string? DUTDeviceRole { get; set; }
+    
+    // Shunt resistance for current measurement (Ohms)
+    [XmlElement("ShuntResistance")]
+    public double? ShuntResistance { get; set; }
+    
+    // Number of samples to average
+    [XmlElement("SampleCount")]
+    public int SampleCount { get; set; } = 5;
+    
+    // Settling time in ms
+    [XmlElement("SettlingTimeMs")]
+    public int SettlingTimeMs { get; set; } = 1000;
 }
 
 public class Tolerance
@@ -137,6 +157,18 @@ public class StepResult
     public DateTime Timestamp { get; set; } = DateTime.Now;
     public string? ErrorMessage { get; set; }
     public double? Deviation { get; set; }
+    
+    // For calibration: reference measurement (Keithley) - "Richtiger Wert"
+    public double? ReferenceValue { get; set; }
+    
+    // For calibration: DUT readback (H&H) - "Anzeige"  
+    public double? DUTValue { get; set; }
+    
+    // Measurement uncertainty (per ISO 17025)
+    public double? Uncertainty { get; set; }
+    
+    // Warning if >70% of tolerance
+    public bool IsWarning { get; set; }
 }
 
 public enum StepType
