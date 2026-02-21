@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace CalibrationDevices.Devices.Real
 {
-    public class MicrochipRelayCard : ISwitchDevice
+    public class MicrochipRelayCard : IRelayDevice
     {
         private readonly RelayCardConfig _config;
         private readonly HttpClient _http;
@@ -109,7 +109,7 @@ namespace CalibrationDevices.Devices.Real
         }
 
         // ──────────────────────────────────────────────
-        //  ISwitchDevice methods
+        //  IRelayDevice methods
         // ──────────────────────────────────────────────
 
         public async Task SetChannelAsync(int channel)

@@ -7,7 +7,7 @@ namespace CalibrationDevices.Devices.Mocking;
 /// <summary>
 /// Mock implementation of a switch/relay matrix device.
 /// </summary>
-public class MockSwitchDevice : ISwitchDevice
+public class MockSwitchDevice : IRelayDevice
 {
     private readonly ILogService _log;
     private DeviceStatus _status = DeviceStatus.Disconnected;

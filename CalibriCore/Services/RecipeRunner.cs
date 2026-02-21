@@ -500,7 +500,7 @@ public class RecipeRunner
             return new StepResult { Passed = false, ErrorMessage = $"Switch device not found" };
         }
 
-        if (device is ISwitchDevice switchDevice)
+        if (device is IRelayDevice switchDevice)
         {
             if (step.Parameters?.RouteName != null)
             {

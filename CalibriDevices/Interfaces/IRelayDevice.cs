@@ -3,7 +3,7 @@ namespace CalibrationDevices.Interfaces;
 /// <summary>
 /// Interface for switching/relay devices that route signals.
 /// </summary>
-public interface ISwitchDevice : IDevice
+public interface IRelayDevice : IDevice
 {
     Task SetChannelAsync(int channel);
     Task SetChannelAsync(string routeName);
