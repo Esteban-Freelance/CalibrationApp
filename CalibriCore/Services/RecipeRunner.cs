@@ -1,7 +1,6 @@
 using CalibrationDevices.Logging;
 using CalibriCore.Models;
 using CalibrationDevices.Interfaces;
-using CalibrationDevices.Logging;
 
 namespace CalibriCore.Services;
 

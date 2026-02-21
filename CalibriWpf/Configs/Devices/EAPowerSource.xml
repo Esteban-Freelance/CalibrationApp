@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Device id="eaPowerSource_001">
+	<Type>eaps8720u</Type>
+	<Driver>eaps8720u</Driver>
+	<Name>EA PowerSource</Name>
+	<Connection type="TCP">
+		<Address>192.168.178.22</Address>
+		<Port>1001</Port>
+		<Board>0</Board>
+		<Timeout>5000</Timeout>
+	</Connection>
+</Device>

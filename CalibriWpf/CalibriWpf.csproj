@@ -24,4 +24,10 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Configs\TestBenches\RealRecept.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

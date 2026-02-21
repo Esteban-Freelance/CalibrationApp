@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TestBench id="station2" name="Calibration Station 2">
+<TestBench id="station1" name="Real Calibration">
     <Devices>
-        <Device ref="calibrator_001" role="Calibrator" />
+        <Device ref="eaPowerSource_001" role="PowerSource" />
         <Device ref="multimeter_001" role="Calibree" />
         <Device ref="switch_001" role="SwitchMatrix" />
         <Device ref="hvsource_001" role="HVSource" />

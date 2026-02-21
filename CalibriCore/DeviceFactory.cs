@@ -15,49 +15,33 @@ public static class DeviceFactory
     {
         var log = logService ?? throw new ArgumentNullException(nameof(logService));
 
-        return config.Driver.ToLowerInvariant() switch
-        {
-            // Mock devices
-            "mockmultimeter" or "mockmeasurementdevice" =>
-                new MockMeasurementDevice(config.Id, config.Name, log),
+        var driver = config.Driver.ToLowerInvariant();
 
-            "mockcalibrator" or "mocksourcedevice" =>
-                new MockSourceDevice(config.Id, config.Name, log),
+        if (driver == "mockmultimeter" || driver == "mockmeasurementdevice")
+            return new MockMeasurementDevice(config.Id, config.Name, log);
 
-            "mockswitchmatrix" or "mockswitchdevice" =>
-                new MockSwitchDevice(config.Id, config.Name, log),
+        if (driver == "mockcalibrator" || driver == "mocksourcedevice")
+            return new MockSourceDevice(config.Id, config.Name, log);
 
-            "mockhvsource" or "mockhighvoltagesource" =>
-                new MockHighVoltageSource(config.Id, config.Name, log),
+        if (driver == "mockswitchmatrix" || driver == "mockswitchdevice")
+            return new MockSwitchDevice(config.Id, config.Name, log);
 
-            // Real devices
-            "eaps8720u" =>
-                new EAPS8720U(
-                    config.Id,
-                    config.Name,
-                    CreateTcpConfig(config.Connection),
-                    log),
+        if (driver == "mockhvsource" || driver == "mockhighvoltagesource")
+            return new MockHighVoltageSource(config.Id, config.Name, log);
 
-            "keithley3706a" =>
-                new Keithley3706A(
-                    config.Id,
-                    config.Name,
-                    CreateTcpConfig(config.Connection),
-                    log),
+        if (driver == "eaps8720u")
+            return new EAPS8720U(config.Id, config.Name, CreateTcpConfig(config.Connection), log);
 
-            "microchiprelaycard" =>
-                new MicrochipRelayCard(
-                    config.Id,
-                    config.Name,
-                    CreateRelayCardConfig(config.Connection)),
+        if (driver == "keithley3706a")
+            return new Keithley3706A(config.Id, config.Name, CreateTcpConfig(config.Connection), log);
 
-            "hhload" or "hhmeasurementdevice" =>
-                new HhMeasurementDevice(
-                    config.Id,
-                    CreateVisaResource(config.Connection)),
+        if (driver == "microchiprelaycard")
+            return new MicrochipRelayCard(config.Id, config.Name, CreateRelayCardConfig(config.Connection));
 
-            _ => throw new ArgumentException($"Unknown driver type: {config.Driver}")
-        };
+        if (driver == "hhload" || driver == "hhmeasurementdevice")
+            return new HhMeasurementDevice(config.Id, CreateVisaResource(config.Connection));
+
+        throw new ArgumentException($"Unknown driver type: {config.Driver}");
     }
 
     private static TcpConfig CreateTcpConfig(ConnectionConfig? conn)
