@@ -3,9 +3,9 @@
     <Type>H&amp;H ZS Lasten</Type>
     <Driver>HhMeasurementDevice</Driver>
     <Name>H&amp;H ZS Lasten (DUT)</Name>
-    <Connection type="VISA">
-        <Address>192.168.178.31</Address>
-        <Port>5025</Port>
+    <Connection type="GPIB">
+        <Address>1</Address>
+        <Board>0</Board>
         <Timeout>5000</Timeout>
     </Connection>
 </Device>
