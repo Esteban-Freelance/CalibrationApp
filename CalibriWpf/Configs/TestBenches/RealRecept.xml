@@ -8,7 +8,7 @@
         <!-- DUT (H&amp;H ZS Lasten - "Anzeige") -->
         <Device ref="hhload_001" role="DUT" />
         <!-- Switch/Relay for routing -->
-        <Device ref="relaycard_001" role="SwitchMatrix" />
+        <Device ref="relaycard_001" role="Relay" />
     </Devices>
     <Wiring>
         <Route name="VoltageDC" switchChannel="1" description="DC Voltage path (PowerSource -> DUT)" />

@@ -8,7 +8,7 @@
         <!-- Mock DUT -->
         <Device ref="mockDUT_001" role="DUT" />
         <!-- Mock Switch -->
-        <Device ref="mockSwitch_001" role="SwitchMatrix" />
+        <Device ref="mockSwitch_001" role="Relay" />
     </Devices>
     <Wiring>
         <Route name="VoltageDC" switchChannel="1" description="DC Voltage path (PowerSource -> DUT)" />

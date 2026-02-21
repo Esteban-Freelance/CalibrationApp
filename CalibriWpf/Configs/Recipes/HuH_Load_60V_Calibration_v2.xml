@@ -9,7 +9,7 @@
     <Role>Reference</Role>
     <Role>DUT</Role>
     <Role>PowerSource</Role>
-    <Role>SwitchMatrix</Role>
+    <Role>Relay</Role>
   </RequiredRoles>
 
   <Steps>
