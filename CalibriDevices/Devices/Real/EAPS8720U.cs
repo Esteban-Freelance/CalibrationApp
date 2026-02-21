@@ -3,7 +3,7 @@ using CalibrationDevices.Logging;
 using System.Net.Sockets;
 using System.Text;
 
-namespace Devices.Devices.Real;
+namespace CalibrationDevices.Devices.Real;
 public class EAPS8720U : ISourceDevice
 {
     private readonly TcpConfig _config;
