@@ -81,7 +81,16 @@ public static class DeviceFactory
             throw new ArgumentException("VISA connection requires an Address in DeviceConfig.Connection");
         }
 
-        // Construct VISA resource string (e.g., "TCPIP0::192.168.1.50::INSTR")
+        var type = conn.Type?.ToUpperInvariant() ?? "";
+        
+        // GPIB: GPIB0::1::INSTR
+        if (type == "GPIB")
+        {
+            var board = conn.Board ?? 0;
+            return $"GPIB{board}::{conn.Address}::INSTR";
+        }
+
+        // TCP/IP: TCPIP0::192.168.1.50::5025::INSTR
         var port = int.TryParse(conn.Port, out var p) ? p : 5025;
         return $"TCPIP0::{conn.Address}::{port}::INSTR";
     }

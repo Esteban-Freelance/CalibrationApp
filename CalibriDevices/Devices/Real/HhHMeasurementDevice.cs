@@ -12,7 +12,7 @@ public class HhMeasurementDevice : IMeasurementDevice, IDisposable
     private readonly string _resource;
     private MessageBasedSession? _session;
     private readonly string _id;
-    private string _name = "Unknown";
+    private string _name = "H&H Load";
     private DeviceStatus _status = DeviceStatus.Disconnected;
 
     public string Id => _id;

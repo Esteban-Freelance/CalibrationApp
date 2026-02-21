@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Device id="relaycard_001">
+    <Type>MicrochipRelayCard</Type>
+    <Driver>MicrochipRelayCard</Driver>
+    <Name>Microchip Relay Card</Name>
+    <Connection type="HTTP">
+        <Address>192.168.178.32</Address>
+        <Port>80</Port>
+        <Timeout>3000</Timeout>
+    </Connection>
+</Device>

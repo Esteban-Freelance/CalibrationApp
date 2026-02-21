@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Device id="hhload_001">
+    <Type>hhload</Type>
+    <Driver>HhMeasurementDevice</Driver>
+    <Name>H&amp;H ZS Lasten (DUT)</Name>
+    <Connection type="GPIB">
+        <Address>1</Address>
+        <Board>0</Board>
+        <Timeout>5000</Timeout>
+    </Connection>
+</Device>
