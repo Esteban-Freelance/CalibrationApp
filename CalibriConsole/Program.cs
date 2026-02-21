@@ -119,6 +119,10 @@ class Program
         var testBench = new TestBenchService(log);
         await testBench.InitializeAsync(benchConfig, devices);
 
+        // Create report service for caching and export
+        var cachePath = Path.Combine(configPath, "..", "Cache", "Reports");
+        var reportService = new ReportService(cachePath, log);
+
         Console.WriteLine("Connecting devices...");
         await testBench.ConnectAllAsync();
 
@@ -128,7 +132,7 @@ class Program
         }
         Console.WriteLine();
 
-        var runner = new RecipeRunner(testBench, log);
+        var runner = new RecipeRunner(testBench, log, reportService);
         
         runner.StepCompleted += (s, step) => 
         {
@@ -141,6 +145,7 @@ class Program
             Console.WriteLine("=== CALIBRATION RESULT ===");
             Console.WriteLine($"Overall: {report.OverallResult}");
             Console.WriteLine($"Steps:   {report.StepReports.Count(r => r.Status == StepStatus.Passed)}/{report.StepReports.Count} passed");
+            Console.WriteLine($"Report ID: {report.ReportId}");
             
             var failed = report.StepReports.Where(r => r.Status == StepStatus.Failed).ToList();
             if (failed.Any())
@@ -151,6 +156,22 @@ class Program
                     Console.WriteLine($"  - {f.StepName}: {f.ErrorMessage}");
                 }
             }
+
+            // Export reports
+            var exportDir = Path.Combine(configPath, "..", "Exports");
+            Directory.CreateDirectory(exportDir);
+
+            var baseName = $"Calibration_{report.RecipeId}_{report.StartTime:yyyyMMdd_HHmmss}";
+            
+            // Export to JSON
+            var jsonPath = Path.Combine(exportDir, baseName + ".json");
+            reportService.ExportToJson(report, jsonPath);
+            Console.WriteLine($"Exported: {jsonPath}");
+
+            // Export to CSV
+            var csvPath = Path.Combine(exportDir, baseName + ".csv");
+            reportService.ExportToCsv(report, csvPath);
+            Console.WriteLine($"Exported: {csvPath}");
         };
 
         Console.WriteLine("Running calibration...");
