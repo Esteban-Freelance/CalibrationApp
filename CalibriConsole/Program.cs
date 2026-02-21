@@ -50,20 +50,20 @@ class Program
         Console.WriteLine("  help         Show this help");
         Console.WriteLine();
         Console.WriteLine("Run options:");
-        Console.WriteLine("  --testbench  Test bench name (default: MockRecept)");
-        Console.WriteLine("  --recipe     Recipe name (default: HuH_Load_60V_Calibration_v2)");
+        Console.WriteLine("  --testbench  Test bench name (default: mock_station1)");
+        Console.WriteLine("  --recipe     Recipe name (default: HuH-Load-60V-Calibration)");
         Console.WriteLine("  --config     Config path (default: CalibriWpf/Configs)");
         Console.WriteLine("  --operator   Operator name (default: Console)");
         Console.WriteLine();
         Console.WriteLine("Examples:");
         Console.WriteLine("  dotnet run --project CalibriConsole -- run");
-        Console.WriteLine("  dotnet run --project CalibriConsole -- run --testbench MockRecept --recipe HuH_Load_60V_Calibration_v2");
+        Console.WriteLine("  dotnet run --project CalibriConsole -- run --testbench mock_station1 --recipe HuH-Load-60V-Calibration");
     }
 
     static async Task RunCalibrationAsync(string[] args)
     {
-        var testbench = "MockRecept";
-        var recipe = "HuH_Load_60V_Calibration_v2";
+        var testbench = "mock_station1";
+        var recipe = "HuH-Load-60V-Calibration";
         var config = "CalibriWpf/Configs";
         var op = "Console";
 
