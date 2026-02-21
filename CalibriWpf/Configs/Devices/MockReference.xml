@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Device id="mockReference_001">
+    <Type>Keithley3706A</Type>
+    <Driver>MockMultimeter</Driver>
+    <Name>Mock Keithley Reference Meter</Name>
+    <Connection type="TCP">
+        <Address>127.0.0.1</Address>
+        <Port>5025</Port>
+        <Timeout>5000</Timeout>
+    </Connection>
+</Device>

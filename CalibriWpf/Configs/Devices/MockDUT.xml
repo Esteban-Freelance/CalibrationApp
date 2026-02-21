@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Device id="mockDUT_001">
+    <Type>hhload</Type>
+    <Driver>MockMeasurementDevice</Driver>
+    <Name>Mock H&amp;H Load (DUT)</Name>
+    <Connection type="TCP">
+        <Address>127.0.0.1</Address>
+        <Port>5026</Port>
+        <Timeout>5000</Timeout>
+    </Connection>
+</Device>

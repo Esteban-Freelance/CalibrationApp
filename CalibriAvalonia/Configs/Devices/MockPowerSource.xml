@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Device id="mockPowerSource_001">
+    <Type>EAPS8720U</Type>
+    <Driver>MockSourceDevice</Driver>
+    <Name>Mock EA PowerSource</Name>
+    <Connection type="TCP">
+        <Address>127.0.0.1</Address>
+        <Port>1001</Port>
+        <Timeout>5000</Timeout>
+    </Connection>
+</Device>

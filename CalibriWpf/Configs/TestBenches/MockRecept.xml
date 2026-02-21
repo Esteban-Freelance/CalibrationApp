@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestBench id="mock_station1" name="Mock Calibration Station">
+    <Devices>
+        <!-- Mock Power Source -->
+        <Device ref="mockPowerSource_001" role="PowerSource" />
+        <!-- Mock Reference Meter -->
+        <Device ref="mockReference_001" role="Reference" />
+        <!-- Mock DUT -->
+        <Device ref="mockDUT_001" role="DUT" />
+        <!-- Mock Switch -->
+        <Device ref="mockSwitch_001" role="SwitchMatrix" />
+    </Devices>
+    <Wiring>
+        <Route name="VoltageDC" switchChannel="1" description="DC Voltage path (PowerSource -> DUT)" />
+        <Route name="CurrentDC" switchChannel="2" description="DC Current path" />
+        <Route name="Resistance" switchChannel="3" description="4-wire Resistance path" />
+        <Route name="VoltageAC" switchChannel="4" description="AC Voltage path" />
+        <Route name="CurrentAC" switchChannel="5" description="AC Current path" />
+    </Wiring>
+</TestBench>

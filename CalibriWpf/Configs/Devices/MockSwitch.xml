@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Device id="mockSwitch_001">
+    <Type>SwitchMatrix</Type>
+    <Driver>MockSwitchDevice</Driver>
+    <Name>Mock Relay Switch</Name>
+    <Connection type="Serial">
+        <Address>127.0.0.1</Address>
+        <Port>COM99</Port>
+        <Timeout>3000</Timeout>
+    </Connection>
+</Device>
