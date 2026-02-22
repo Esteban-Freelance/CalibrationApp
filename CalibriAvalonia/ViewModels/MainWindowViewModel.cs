@@ -138,13 +138,19 @@ public partial class MainWindowViewModel : ObservableObject
         Devices.Clear();
         foreach (var (role, device) in _testBench.GetAllDevices())
         {
+            // Get device config for address/port
+            var deviceConfig = _deviceConfigs.FirstOrDefault(d => 
+                d.Name.Equals(device.Name, StringComparison.OrdinalIgnoreCase));
+            
             Devices.Add(new DeviceViewModel
             {
                 Role = role,
                 Name = device.Name,
                 DeviceType = device.DeviceType,
                 Status = device.Status.ToString(),
-                IsConnected = false
+                IsConnected = false,
+                Address = deviceConfig?.Connection?.Address ?? "",
+                Port = int.TryParse(deviceConfig?.Connection?.Port, out var p) ? p : 0
             });
         }
         
@@ -276,6 +282,44 @@ public partial class MainWindowViewModel : ObservableObject
     {
         LoadConfigurations();
     }
+    
+    [RelayCommand]
+    private async Task ReconnectDeviceAsync(DeviceViewModel deviceVm)
+    {
+        if (string.IsNullOrEmpty(deviceVm.Role)) return;
+        
+        _log.Info($"Reconnecting device: {deviceVm.Role}");
+        
+        var device = _testBench.GetDeviceByRole(deviceVm.Role);
+        if (device != null)
+        {
+            try
+            {
+                await device.DisconnectAsync();
+                await device.ConnectAsync();
+                deviceVm.IsConnected = device.Status == DeviceStatus.Connected;
+                deviceVm.Status = device.Status.ToString();
+                _log.Info($"Device {deviceVm.Role} reconnected: {deviceVm.IsConnected}");
+            }
+            catch (Exception ex)
+            {
+                _log.Error($"Failed to reconnect {deviceVm.Role}: {ex.Message}");
+                deviceVm.Status = "Error";
+                deviceVm.IsConnected = false;
+            }
+        }
+        
+        UpdateCanRun();
+    }
+    
+    [RelayCommand]
+    private void EditDeviceConfig(DeviceViewModel deviceVm)
+    {
+        // Notify UI to show config dialog
+        OnDeviceConfigEdit?.Invoke(this, deviceVm);
+    }
+    
+    public event EventHandler<DeviceViewModel>? OnDeviceConfigEdit;
     
     private void OnStepStarted(object? sender, RecipeStep step)
     {
@@ -415,6 +459,12 @@ public partial class DeviceViewModel : ObservableObject
     
     [ObservableProperty]
     private bool _isConnected;
+    
+    [ObservableProperty]
+    private string _address = "";
+    
+    [ObservableProperty]
+    private int _port;
 }
 
 public partial class StepViewModel : ObservableObject

@@ -120,8 +120,10 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
@@ -132,6 +134,32 @@
                                         
                                         <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Role}" FontWeight="SemiBold"/>
                                         <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Name}" Foreground="#6B7280" FontSize="12"/>
+                                        
+                                        <!-- Address display -->
+                                        <TextBlock Grid.Column="1" Grid.Row="2" FontSize="10" Foreground="#9CA3AF">
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="{}{0}:{1}">
+                                                    <Binding Path="Address"/>
+                                                    <Binding Path="Port"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                        
+                                        <!-- Action Buttons -->
+                                        <StackPanel Grid.Column="2" Grid.RowSpan="3" Orientation="Vertical" Spacing="4" VerticalAlignment="Center">
+                                            <Button Content="⟳" 
+                                                    Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).ReconnectDeviceCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    ToolTip.Tip="Reconnect"
+                                                    Width="28" Height="28" Padding="0"
+                                                    Background="#F3F4F6" BorderThickness="1" BorderBrush="#D1D5DB"/>
+                                            <Button Content="⚙" 
+                                                    Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).EditDeviceConfigCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    ToolTip.Tip="Edit Config"
+                                                    Width="28" Height="28" Padding="0"
+                                                    Background="#F3F4F6" BorderThickness="1" BorderBrush="#D1D5DB"/>
+                                        </StackPanel>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

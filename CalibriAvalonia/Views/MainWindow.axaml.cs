@@ -21,6 +21,7 @@ public partial class MainWindow : Window
         if (DataContext is MainWindowViewModel vm)
         {
             vm.OnReportSaved += OnReportSaved;
+            vm.OnDeviceConfigEdit += OnDeviceConfigEdit;
         }
     }
     
@@ -96,6 +97,59 @@ public partial class MainWindow : Window
         dialog.Content = panel;
         
         // Show as modal dialog
+        await dialog.ShowDialog(this);
+    }
+    
+    private async void OnDeviceConfigEdit(object? sender, DeviceViewModel deviceVm)
+    {
+        // Create a styled dialog for editing device config
+        var dialog = new Window
+        {
+            Title = $"Edit {deviceVm.Role} Config",
+            Width = 400,
+            Height = 220,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            CanResize = false,
+            Background = new SolidColorBrush(Color.Parse("#F3F4F6")),
+            Padding = new Thickness(24)
+        };
+        
+        var panel = new StackPanel { Spacing = 12 };
+        
+        // Address field
+        var addressLabel = new TextBlock { Text = "Address (IP/Hostname):", FontWeight = FontWeight.SemiBold, Margin = new Thickness(0, 0, 0, 4) };
+        var addressBox = new TextBox { Text = deviceVm.Address, Watermark = "192.168.1.100" };
+        
+        // Port field
+        var portLabel = new TextBlock { Text = "Port:", FontWeight = FontWeight.SemiBold, Margin = new Thickness(0, 8, 0, 4) };
+        var portBox = new NumericUpDown { Value = deviceVm.Port, Minimum = 1, Maximum = 65535, Increment = 1 };
+        
+        // Buttons
+        var buttonPanel = new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 8, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center, Margin = new Thickness(0, 16, 0, 0) };
+        
+        var saveButton = new Button { Content = "Save", Width = 80, Background = new SolidColorBrush(Color.Parse("#10B981")), Foreground = new SolidColorBrush(Colors.White), Padding = new Thickness(16, 8) };
+        var cancelButton = new Button { Content = "Cancel", Width = 80, Background = new SolidColorBrush(Color.Parse("#6B7280")), Foreground = new SolidColorBrush(Colors.White), Padding = new Thickness(16, 8) };
+        
+        saveButton.Click += (s, e) =>
+        {
+            deviceVm.Address = addressBox.Text ?? "";
+            deviceVm.Port = (int)(portBox.Value ?? 0);
+            dialog.Close();
+        };
+        
+        cancelButton.Click += (s, e) => dialog.Close();
+        
+        buttonPanel.Children.Add(saveButton);
+        buttonPanel.Children.Add(cancelButton);
+        
+        panel.Children.Add(addressLabel);
+        panel.Children.Add(addressBox);
+        panel.Children.Add(portLabel);
+        panel.Children.Add(portBox);
+        panel.Children.Add(buttonPanel);
+        
+        dialog.Content = panel;
+        
         await dialog.ShowDialog(this);
     }
 }
