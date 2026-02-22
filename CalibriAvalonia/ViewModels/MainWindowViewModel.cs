@@ -19,6 +19,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly TestBenchService _testBench;
     private readonly RecipeRunner _recipeRunner;
     private readonly ILogService _log;
+    private readonly ReportService _reportService;
     
     // Event to notify UI when report is saved
     public event EventHandler<string>? OnReportSaved;
@@ -77,9 +78,12 @@ public partial class MainWindowViewModel : ObservableObject
         _log = AvaloniaLogService.Instance;
         
         var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Configs");
+        var cachePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache", "Reports");
+        
         _configService = new ConfigurationService(configPath, _log);
+        _reportService = new ReportService(cachePath, _log);
         _testBench = new TestBenchService(_log);
-        _recipeRunner = new RecipeRunner(_testBench, _log);
+        _recipeRunner = new RecipeRunner(_testBench, _log, _reportService);
         
         // Subscribe to recipe runner events
         _recipeRunner.StepStarted += OnStepStarted;
@@ -368,19 +372,27 @@ public partial class MainWindowViewModel : ObservableObject
             
             CurrentStatus = $"Complete: {passed} passed, {failed} failed";
             
-            // Save report
+            // Create folder for this report
             var reportsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reports");
-            Directory.CreateDirectory(reportsPath);
-            _configService.SaveReport(report, reportsPath);
+            var reportFolderName = $"Report_{report.RecipeId}_{report.StartTime:yyyyMMdd_HHmmss}";
+            var reportFolder = Path.Combine(reportsPath, reportFolderName);
+            Directory.CreateDirectory(reportFolder);
             
-            // Log report save location
-            var reportFileName = $"Report_{report.RecipeId}_{report.StartTime:yyyyMMdd_HHmmss}.xml";
-            var fullReportPath = Path.Combine(reportsPath, reportFileName);
-            _log.Debug($"Report saved to: {fullReportPath}");
+            // Save in multiple formats
+            var xmlPath = Path.Combine(reportFolder, "report.xml");
+            var jsonPath = Path.Combine(reportFolder, "report.json");
+            var csvPath = Path.Combine(reportFolder, "report.csv");
+            
+            _reportService.ExportToXml(report, xmlPath);
+            _reportService.ExportToJson(report, jsonPath);
+            _reportService.ExportToCsv(report, csvPath);
+            
+            // Also save to cache
+            _reportService.SaveToCache(report);
             
             // Notify UI to show dialog
-            LastReportPath = fullReportPath;
-            OnReportSaved?.Invoke(this, fullReportPath);
+            LastReportPath = reportFolder;
+            OnReportSaved?.Invoke(this, reportFolder);
             
             CurrentStatus = $"Complete: {passed} passed, {failed} failed";
         });
