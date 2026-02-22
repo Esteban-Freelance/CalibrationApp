@@ -13,6 +13,9 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         
+        // Ensure window is centered on screen
+        WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        
         Loaded += OnLoaded;
         
         // Auto-scroll log to bottom
@@ -46,7 +49,7 @@ public partial class MainWindow : Window
             Title = "Report Saved",
             Width = 500,
             Height = 200,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
             ResizeMode = ResizeMode.NoResize,
             Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F4F6")),
             Padding = new Thickness(24)
