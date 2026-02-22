@@ -52,6 +52,20 @@ public class ConfigurationService
         return devices;
     }
 
+    public void SaveDeviceConfig(DeviceConfig device)
+    {
+        var devicesPath = Path.Combine(_configBasePath, "Devices");
+        Directory.CreateDirectory(devicesPath);
+        
+        var filePath = Path.Combine(devicesPath, $"{device.Id}.xml");
+        var serializer = new XmlSerializer(typeof(DeviceConfig));
+        
+        using var writer = new StreamWriter(filePath);
+        serializer.Serialize(writer, device);
+        
+        _log.Info($"Saved device config: {device.Id}");
+    }
+
     public IEnumerable<TestBenchConfig> LoadTestBenchConfigs()
     {
         var benchesPath = Path.Combine(_configBasePath, "TestBenches");

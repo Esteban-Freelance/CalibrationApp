@@ -279,6 +279,10 @@ public partial class MainViewModel : ObservableObject
         
         _log.Info($"Reconnecting device: {deviceVm.Role}");
         
+        // Reset states
+        deviceVm.IsConnecting = true;
+        deviceVm.ConnectionFailed = false;
+        
         var device = _testBench.GetDeviceByRole(deviceVm.Role);
         if (device != null)
         {
@@ -289,15 +293,22 @@ public partial class MainViewModel : ObservableObject
                 deviceVm.IsConnected = device.Status == DeviceStatus.Connected;
                 deviceVm.Status = device.Status.ToString();
                 _log.Info($"Device {deviceVm.Role} reconnected: {deviceVm.IsConnected}");
+                
+                if (!deviceVm.IsConnected)
+                {
+                    deviceVm.ConnectionFailed = true;
+                }
             }
             catch (Exception ex)
             {
                 _log.Error($"Failed to reconnect {deviceVm.Role}: {ex.Message}");
                 deviceVm.Status = "Error";
                 deviceVm.IsConnected = false;
+                deviceVm.ConnectionFailed = true;
             }
         }
         
+        deviceVm.IsConnecting = false;
         UpdateCanRun();
     }
     
@@ -305,6 +316,26 @@ public partial class MainViewModel : ObservableObject
     private void EditDeviceConfig(DeviceViewModel deviceVm)
     {
         OnDeviceConfigEdit?.Invoke(this, deviceVm);
+    }
+    
+    public void SaveDeviceConfig(string role, string address, int port)
+    {
+        var deviceConfig = _deviceConfigs.FirstOrDefault(d => 
+            d.Name.Equals(Devices.FirstOrDefault(dv => dv.Role == role)?.Name, StringComparison.OrdinalIgnoreCase));
+        
+        if (deviceConfig != null)
+        {
+            if (deviceConfig.Connection == null)
+            {
+                deviceConfig.Connection = new ConnectionConfig();
+            }
+            
+            deviceConfig.Connection.Address = address;
+            deviceConfig.Connection.Port = port.ToString();
+            
+            _configService.SaveDeviceConfig(deviceConfig);
+            _log.Info($"Saved device config for {role}: {address}:{port}");
+        }
     }
     
     private void OnStepStarted(object? sender, RecipeStep step)
@@ -448,6 +479,12 @@ public partial class DeviceViewModel : ObservableObject
     
     [ObservableProperty]
     private bool _isConnected;
+    
+    [ObservableProperty]
+    private bool _isConnecting;
+    
+    [ObservableProperty]
+    private bool _connectionFailed;
     
     [ObservableProperty]
     private string _address = "";

@@ -110,6 +110,8 @@ public partial class MainWindow : Window
     
     private void OnDeviceConfigEdit(object? sender, ViewModels.DeviceViewModel deviceVm)
     {
+        var vm = DataContext as ViewModels.MainViewModel;
+        
         // Create a styled dialog for editing device config
         var dialog = new Window
         {
@@ -141,9 +143,15 @@ public partial class MainWindow : Window
         
         saveButton.Click += (s, e) =>
         {
-            deviceVm.Address = addressBox.Text ?? "";
-            int port = int.TryParse(portBox.Text, out var p) ? Math.Clamp(p, 1, 65535) : 5025;
-            deviceVm.Port = port;
+            var newAddress = addressBox.Text ?? "";
+            int newPort = int.TryParse(portBox.Text, out var p) ? Math.Clamp(p, 1, 65535) : 5025;
+            
+            deviceVm.Address = newAddress;
+            deviceVm.Port = newPort;
+            
+            // Save to XML file
+            vm?.SaveDeviceConfig(deviceVm.Role, newAddress, newPort);
+            
             dialog.Close();
         };
         

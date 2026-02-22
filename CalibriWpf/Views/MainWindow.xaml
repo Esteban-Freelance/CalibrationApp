@@ -146,8 +146,21 @@
                                                 <Style TargetType="Ellipse">
                                                     <Setter Property="Fill" Value="#9CA3AF"/>
                                                     <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsConnecting}" Value="True">
+                                                            <DataTrigger.EnterActions>
+                                                                <BeginStoryboard>
+                                                                    <Storyboard RepeatBehavior="Forever">
+                                                                        <ColorAnimation Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)"
+                                                                                        To="#10B981" Duration="0:0:0.3" AutoReverse="True"/>
+                                                                    </Storyboard>
+                                                                </BeginStoryboard>
+                                                            </DataTrigger.EnterActions>
+                                                        </DataTrigger>
                                                         <DataTrigger Binding="{Binding IsConnected}" Value="True">
                                                             <Setter Property="Fill" Value="{StaticResource SuccessBrush}"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding ConnectionFailed}" Value="True">
+                                                            <Setter Property="Fill" Value="#EF4444"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
