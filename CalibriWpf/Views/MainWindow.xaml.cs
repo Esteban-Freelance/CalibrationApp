@@ -92,7 +92,7 @@ public partial class MainWindow : Window
             HorizontalAlignment = HorizontalAlignment.Center,
             Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3B82F6")),
             Foreground = Brushes.White,
-            Padding = new Thickness(16, 8),
+            Padding = new Thickness(16, 8, 16, 8),
             BorderThickness = new Thickness(0)
         };
         
@@ -104,6 +104,6 @@ public partial class MainWindow : Window
         
         dialog.Content = panel;
         
-        dialog.ShowDialog(this);
+        dialog.ShowDialog();
     }
 }
