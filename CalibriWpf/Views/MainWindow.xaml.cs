@@ -30,6 +30,7 @@ public partial class MainWindow : Window
         if (DataContext is ViewModels.MainViewModel vm)
         {
             vm.OnReportSaved += OnReportSaved;
+            vm.OnDeviceConfigEdit += OnDeviceConfigEdit;
         }
     }
     
@@ -101,6 +102,59 @@ public partial class MainWindow : Window
         panel.Children.Add(message);
         panel.Children.Add(path);
         panel.Children.Add(button);
+        
+        dialog.Content = panel;
+        
+        dialog.ShowDialog();
+    }
+    
+    private void OnDeviceConfigEdit(object? sender, ViewModels.DeviceViewModel deviceVm)
+    {
+        // Create a styled dialog for editing device config
+        var dialog = new Window
+        {
+            Title = $"Edit {deviceVm.Role} Config",
+            Width = 400,
+            Height = 220,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            ResizeMode = ResizeMode.NoResize,
+            Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F4F6")),
+            Padding = new Thickness(24)
+        };
+        
+        var panel = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+        
+        // Address field
+        var addressLabel = new TextBlock { Text = "Address (IP/Hostname):", FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 4) };
+        var addressBox = new TextBox { Text = deviceVm.Address };
+        
+        // Port field
+        var portLabel = new TextBlock { Text = "Port:", FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 12, 0, 4) };
+        var portBox = new System.Windows.Controls.Primitives.NumericUpDown { Value = deviceVm.Port, Minimum = 1, Maximum = 65535, Increment = 1 };
+        
+        // Buttons
+        var buttonPanel = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 20, 0, 0) };
+        
+        var saveButton = new Button { Content = "Save", Width = 80, Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")), Foreground = Brushes.White, Padding = new Thickness(16, 8, 16, 8), BorderThickness = new Thickness(0) };
+        var cancelButton = new Button { Content = "Cancel", Width = 80, Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#6B7280")), Foreground = Brushes.White, Padding = new Thickness(16, 8, 16, 8), BorderThickness = new Thickness(0), Margin = new Thickness(8, 0, 0, 0) };
+        
+        saveButton.Click += (s, e) =>
+        {
+            deviceVm.Address = addressBox.Text ?? "";
+            deviceVm.Port = (int)(portBox.Value ?? 0);
+            dialog.Close();
+        };
+        
+        cancelButton.Click += (s, e) => dialog.Close();
+        
+        buttonPanel.Children.Add(saveButton);
+        buttonPanel.Children.Add(cancelButton);
+        
+        panel.Children.Add(addressLabel);
+        panel.Children.Add(addressBox);
+        panel.Children.Add(portLabel);
+        panel.Children.Add(portBox);
+        panel.Children.Add(buttonPanel);
         
         dialog.Content = panel;
         
