@@ -86,18 +86,18 @@ public class ReportService
     {
         var lines = new List<string>
         {
-            "Step,Name,Type,Status,Nominal,Measured,Unit,Deviation,LowerLimit,UpperLimit,Error"
+            "Step;Name;Type;Status;Nominal;Measured;Unit;Deviation;LowerLimit;UpperLimit;Error"
         };
 
         foreach (var step in report.StepReports)
         {
-            lines.Add($"{step.StepOrder},{EscapeCsv(step.StepName)},{step.StepType},{step.Status}," +
-                     $"{step.NominalValue?.ToString() ?? ""}," +
-                     $"{step.MeasuredValue?.ToString() ?? ""}," +
-                     $"{step.Unit ?? ""}," +
-                     $"{step.Deviation?.ToString() ?? ""}," +
-                     $"{step.LowerLimit?.ToString() ?? ""}," +
-                     $"{step.UpperLimit?.ToString() ?? ""}," +
+            lines.Add($"{step.StepOrder};{EscapeCsv(step.StepName)};{step.StepType};{step.Status};" +
+                     $"{step.NominalValue?.ToString() ?? ""};" +
+                     $"{step.MeasuredValue?.ToString() ?? ""};" +
+                     $"{step.Unit ?? ""};" +
+                     $"{step.Deviation?.ToString() ?? ""};" +
+                     $"{step.LowerLimit?.ToString() ?? ""};" +
+                     $"{step.UpperLimit?.ToString() ?? ""};" +
                      $"{EscapeCsv(step.ErrorMessage ?? "")}");
         }
 
