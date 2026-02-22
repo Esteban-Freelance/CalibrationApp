@@ -355,6 +355,10 @@ public partial class MainViewModel : ObservableObject
             var reportsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reports");
             Directory.CreateDirectory(reportsPath);
             _configService.SaveReport(report, reportsPath);
+            
+            // Log report save location to UI
+            _log.Info($"Report saved to: {reportsPath}/Report_{report.RecipeId}_{report.StartTime:yyyyMMdd_HHmmss}.xml");
+            CurrentStatus = $"Complete: {passed} passed, {failed} failed | Report: {reportsPath}";
         });
     }
 }
