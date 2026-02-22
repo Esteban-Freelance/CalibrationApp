@@ -127,11 +127,12 @@ public partial class MainWindow : Window
         // Address field
         var addressLabel = new TextBlock { Text = "Address (IP/Hostname):", FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 4) };
         var addressBox = new TextBox { Text = deviceVm.Address };
-        
+
         // Port field
         var portLabel = new TextBlock { Text = "Port:", FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 12, 0, 4) };
-        var portBox = new System.Windows.Controls.Primitives.NumericUpDown { Value = deviceVm.Port, Minimum = 1, Maximum = 65535, Increment = 1 };
-        
+        var portBox = new TextBox { Text = deviceVm.Port.ToString(), Width = 100 };
+        portBox.PreviewTextInput += (s, e) => e.Handled = !int.TryParse(e.Text, out _);
+
         // Buttons
         var buttonPanel = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 20, 0, 0) };
         
@@ -141,7 +142,8 @@ public partial class MainWindow : Window
         saveButton.Click += (s, e) =>
         {
             deviceVm.Address = addressBox.Text ?? "";
-            deviceVm.Port = (int)(portBox.Value ?? 0);
+            int port = int.TryParse(portBox.Text, out var p) ? Math.Clamp(p, 1, 65535) : 5025;
+            deviceVm.Port = port;
             dialog.Close();
         };
         
