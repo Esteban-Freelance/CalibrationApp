@@ -20,6 +20,12 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly RecipeRunner _recipeRunner;
     private readonly ILogService _log;
     
+    // Event to notify UI when report is saved
+    public event EventHandler<string>? OnReportSaved;
+    
+    [ObservableProperty]
+    private string? _lastReportPath;
+    
     [ObservableProperty]
     private ObservableCollection<TestBenchConfig> _testBenches = new();
     
@@ -367,9 +373,16 @@ public partial class MainWindowViewModel : ObservableObject
             Directory.CreateDirectory(reportsPath);
             _configService.SaveReport(report, reportsPath);
             
-            // Log report save location to UI
-            _log.Info($"Report saved to: {reportsPath}/Report_{report.RecipeId}_{report.StartTime:yyyyMMdd_HHmmss}.xml");
-            CurrentStatus = $"Complete: {passed} passed, {failed} failed | Report: {reportsPath}";
+            // Log report save location
+            var reportFileName = $"Report_{report.RecipeId}_{report.StartTime:yyyyMMdd_HHmmss}.xml";
+            var fullReportPath = Path.Combine(reportsPath, reportFileName);
+            _log.Debug($"Report saved to: {fullReportPath}");
+            
+            // Notify UI to show dialog
+            LastReportPath = fullReportPath;
+            OnReportSaved?.Invoke(this, fullReportPath);
+            
+            CurrentStatus = $"Complete: {passed} passed, {failed} failed";
         });
     }
 }
