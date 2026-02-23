@@ -1,11 +1,12 @@
-using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+using CalibrationDevices.Interfaces;
+using CalibrationDevices.Logging;
 using CalibriCore.Models;
 using CalibriCore.Services;
-using CalibrationDevices.Interfaces;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
 using System.IO;
-using CalibrationDevices.Logging;
+using System.Net.NetworkInformation;
 
 namespace CalibrationApp.ViewModels;
 
@@ -159,27 +160,14 @@ public partial class MainViewModel : ObservableObject
         
         // Auto-connect devices
         await _testBench.ConnectAllAsync();
-        
-        // Update device status in UI
-        foreach (var deviceVm in Devices)
-        {
-            var device = _testBench.GetDeviceByRole(deviceVm.Role);
-            if (device != null)
-            {
-                deviceVm.Status = device.Status.ToString();
-                deviceVm.IsConnected = device.Status == DeviceStatus.Connected;
-                deviceVm.ConnectionFailed = !deviceVm.IsConnected;
-            }
-        }
-        
-        UpdateCanRun();
     }
 
     private void _testBench_DeviceStatusChanged(object? sender, DeviceStatusChangedEventArgs args)
     {
         var deviceVm = Devices.First(device => device.Id == args.DeviceId);
         deviceVm.IsConnecting = args.Status == DeviceStatus.Connecting;
-
+        deviceVm.ConnectionFailed = !deviceVm.IsConnected;
+        deviceVm.IsConnected = args.Status == DeviceStatus.Connected;
         deviceVm.Status = args.Status.ToString();
 
         UpdateCanRun();
@@ -293,10 +281,15 @@ public partial class MainViewModel : ObservableObject
         if (string.IsNullOrEmpty(deviceVm.Role)) return;
         
         _log.Info($"Reconnecting device: {deviceVm.Role}");
-        
+
         // Reset states
-        deviceVm.IsConnecting = true;
         deviceVm.ConnectionFailed = false;
+        deviceVm.IsConnected = false;
+        deviceVm.Status = DeviceStatus.Connecting.ToString();
+        deviceVm.IsConnecting = true;
+
+
+
         
         var device = _testBench.GetDeviceByRole(deviceVm.Role);
         if (device != null)

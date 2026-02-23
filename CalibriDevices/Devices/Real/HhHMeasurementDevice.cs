@@ -1,6 +1,7 @@
 ﻿namespace CalibrationDevices.Devices.Real;
 
     using CalibrationDevices.Interfaces;
+using CalibrationDevices.Logging;
 using NationalInstruments.Visa;
 using System;
 using System.Collections.Generic;
@@ -14,36 +15,49 @@ public class HhMeasurementDevice : IMeasurementDevice, IDisposable
     private readonly string _id;
     private string _name = "H&H Load";
     private DeviceStatus _status = DeviceStatus.Disconnected;
+    private ILogService _log;
 
     public string Id => _id;
     public string Name => _name;
     public string DeviceType => "Load";
     public DeviceStatus Status => _status;
 
-    public HhMeasurementDevice(string id, string resource)
+    public HhMeasurementDevice(string id, string resource, ILogService logService = null)
     {
         _id = id;
         _resource = resource;
+        _log = logService ?? NullLogService.Instance;
     }
 
-    public async Task ConnectAsync()
+    public async Task<bool> ConnectAsync()
     {
+        if (_status == DeviceStatus.Connected)
+            return true;
+
         _status = DeviceStatus.Connecting;
+        _log.Info($"Connecting toH&H Load at {_resource}...");
 
-        var rm = new ResourceManager();
-        _session = (MessageBasedSession)rm.Open(_resource);
+        try
+        {
+            _status = DeviceStatus.Connecting;
 
-        _session.RawIO.Write("*IDN?\n");
-        string idn = _session.RawIO.ReadString();
+            var rm = new ResourceManager();
+            _session = (MessageBasedSession)rm.Open(_resource);
 
-        _session.RawIO.Write("CURR:RANG?\n");
-        string x = _session.RawIO.ReadString();
+            _session.RawIO.Write("*IDN?\n");
+            string idn = _session.RawIO.ReadString();
 
-        _name = ParseName(idn);
+            _name = ParseName(idn);
+            _status = DeviceStatus.Connected;
+            return true;
+        }
+        catch (Exception ex) 
+        {
+            _log.Error($"Connection failed {ex.Message}", Name);
+            _status = DeviceStatus.Error;
+            return false;
+        }
 
-        _status = DeviceStatus.Connected;
-
-        await Task.CompletedTask;
     }
 
     private string ParseName(string idn)
@@ -166,11 +180,6 @@ public class HhMeasurementDevice : IMeasurementDevice, IDisposable
     public void Dispose()
     {
         _session?.Dispose();
-    }
-
-    Task<bool> IDevice.ConnectAsync()
-    {
-        throw new NotImplementedException();
     }
 
     public Task ResetAsync()

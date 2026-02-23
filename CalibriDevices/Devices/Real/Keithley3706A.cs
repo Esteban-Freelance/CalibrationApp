@@ -65,8 +65,9 @@ namespace CalibrationDevices.Devices.Real
                 _status = DeviceStatus.Connected;
                 return true;
             }
-            catch
+            catch(Exception ex)
             {
+                _log.Error($"Connection failed {ex.Message}", Name);
                 _status = DeviceStatus.Error;
                 return false;
             }

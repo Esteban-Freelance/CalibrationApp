@@ -39,7 +39,7 @@ public static class DeviceFactory
             return new MicrochipRelayCard(config.Id, config.Name, CreateRelayCardConfig(config.Connection));
 
         if (driver == "hhload" || driver == "hhmeasurementdevice")
-            return new HhMeasurementDevice(config.Id, CreateVisaResource(config.Connection));
+            return new HhMeasurementDevice(config.Id, CreateVisaResource(config.Connection), log);
 
         throw new ArgumentException($"Unknown driver type: {config.Driver}");
     }
