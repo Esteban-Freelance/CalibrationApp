@@ -57,7 +57,7 @@ public class ConfigurationService
         var devicesPath = Path.Combine(_configBasePath, "Devices");
         Directory.CreateDirectory(devicesPath);
         
-        var filePath = Path.Combine(devicesPath, $"{device.Id}.xml");
+        var filePath = Path.Combine(devicesPath, $"{device.Type}.xml");
         var serializer = new XmlSerializer(typeof(DeviceConfig));
         
         using var writer = new StreamWriter(filePath);
