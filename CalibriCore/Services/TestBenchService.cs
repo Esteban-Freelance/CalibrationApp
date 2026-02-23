@@ -93,7 +93,6 @@ public class TestBenchService
     public async Task ConnectAllAsync()
     {
         _log.Info("Connecting all devices...");
-
         foreach (var device in _devices.Values)
         {
             try

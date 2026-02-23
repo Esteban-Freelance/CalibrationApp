@@ -274,8 +274,8 @@ public partial class MainViewModel : ObservableObject
     {
         LoadConfigurations();
     }
-    
-    [RelayCommand]
+
+    [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task ReconnectDeviceAsync(DeviceViewModel deviceVm)
     {
         if (string.IsNullOrEmpty(deviceVm.Role)) return;

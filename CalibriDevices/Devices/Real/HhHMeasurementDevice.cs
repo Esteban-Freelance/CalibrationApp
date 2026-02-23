@@ -35,7 +35,7 @@ public class HhMeasurementDevice : IMeasurementDevice, IDisposable
             return true;
 
         _status = DeviceStatus.Connecting;
-        _log.Info($"Connecting toH&H Load at {_resource}...");
+        _log.Debug($"Connecting toH&H Load at {_resource}...");
 
         try
         {
