@@ -144,20 +144,23 @@
                                         </Grid.RowDefinitions>
 
                                         <!-- Status Indicator -->
-                                        <Ellipse Grid.Column="0" Grid.RowSpan="2" Width="10" Height="10" Margin="0,0,8,0" VerticalAlignment="Center">
+                                        <Ellipse Grid.Column="0" Grid.RowSpan="2" Width="10" Height="10" Margin="0,0,8,0" VerticalAlignment="Center" x:Name="StatusEllipse">
                                             <Ellipse.Style>
                                                 <Style TargetType="Ellipse">
                                                     <Setter Property="Fill" Value="#9CA3AF"/>
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding IsConnecting}" Value="True">
                                                             <DataTrigger.EnterActions>
-                                                                <BeginStoryboard>
+                                                                <BeginStoryboard x:Name="BlinkStoryboard">
                                                                     <Storyboard RepeatBehavior="Forever">
                                                                         <ColorAnimation Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)"
                                                                                         To="#10B981" Duration="0:0:0.3" AutoReverse="True"/>
                                                                     </Storyboard>
                                                                 </BeginStoryboard>
                                                             </DataTrigger.EnterActions>
+                                                            <DataTrigger.ExitActions>
+                                                                <StopStoryboard BeginStoryboardName="BlinkStoryboard"/>
+                                                            </DataTrigger.ExitActions>
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding IsConnected}" Value="True">
                                                             <Setter Property="Fill" Value="{StaticResource SuccessBrush}"/>
