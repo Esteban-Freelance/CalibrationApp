@@ -18,7 +18,7 @@ public class TestBenchService
     public TestBenchConfig? CurrentConfig { get; private set; }
     public bool IsInitialized => CurrentConfig != null && _devices.Any();
 
-    public event EventHandler<string>? DeviceStatusChanged;
+    public event EventHandler<DeviceStatusChangedEventArgs>? DeviceStatusChanged;
 
     public TestBenchService(ILogService? logService = null)
     {
@@ -99,7 +99,8 @@ public class TestBenchService
             try
             {
                 await device.ConnectAsync();
-                DeviceStatusChanged?.Invoke(this, device.Id);
+                var args = new DeviceStatusChangedEventArgs(device.Id, device.Status);
+                DeviceStatusChanged?.Invoke(this, args);
             }
             catch (Exception ex)
             {
@@ -117,7 +118,8 @@ public class TestBenchService
             try
             {
                 await device.DisconnectAsync();
-                DeviceStatusChanged?.Invoke(this, device.Id);
+                var args = new DeviceStatusChangedEventArgs(device.Id, DeviceStatus.Disconnected);
+                DeviceStatusChanged?.Invoke(this, args);
             }
             catch (Exception ex)
             {
@@ -177,5 +179,17 @@ public class TestBenchService
     public bool HasRequiredRoles(IEnumerable<string> requiredRoles)
     {
         return requiredRoles.All(role => _roleToDeviceId.ContainsKey(role));
+    }
+}
+
+public class DeviceStatusChangedEventArgs : EventArgs
+{
+    public string DeviceId { get; }
+    public DeviceStatus Status { get; }
+
+    public DeviceStatusChangedEventArgs(string deviceId, DeviceStatus status)
+    {
+        DeviceId = deviceId;
+        Status = status;
     }
 }

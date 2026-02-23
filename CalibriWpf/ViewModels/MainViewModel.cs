@@ -140,9 +140,12 @@ public partial class MainViewModel : ObservableObject
             // Get device config for address/port
             var deviceConfig = _deviceConfigs.FirstOrDefault(d => 
                 d.Name.Equals(device.Name, StringComparison.OrdinalIgnoreCase));
+
+            _testBench.DeviceStatusChanged += _testBench_DeviceStatusChanged;
             
             Devices.Add(new DeviceViewModel
             {
+                Id = device.Id,
                 Role = role,
                 Name = device.Name,
                 DeviceType = device.DeviceType,
@@ -167,12 +170,21 @@ public partial class MainViewModel : ObservableObject
                 deviceVm.IsConnected = device.Status == DeviceStatus.Connected;
                 deviceVm.ConnectionFailed = !deviceVm.IsConnected;
             }
-            deviceVm.IsConnecting = false;
         }
         
         UpdateCanRun();
     }
-    
+
+    private void _testBench_DeviceStatusChanged(object? sender, DeviceStatusChangedEventArgs args)
+    {
+        var deviceVm = Devices.First(device => device.Id == args.DeviceId);
+        deviceVm.IsConnecting = args.Status == DeviceStatus.Connecting;
+
+        deviceVm.Status = args.Status.ToString();
+
+        UpdateCanRun();
+    }
+
     partial void OnSelectedRecipeChanged(Recipe? value)
     {
         Steps.Clear();
@@ -468,6 +480,9 @@ public partial class MainViewModel : ObservableObject
 
 public partial class DeviceViewModel : ObservableObject
 {
+    [ObservableProperty]
+    private string _id = "";
+
     [ObservableProperty]
     private string _role = "";
     
