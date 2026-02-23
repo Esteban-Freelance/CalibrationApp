@@ -149,7 +149,8 @@ public partial class MainViewModel : ObservableObject
                 Status = device.Status.ToString(),
                 IsConnected = false,
                 Address = deviceConfig?.Connection?.Address ?? "",
-                Port = int.TryParse(deviceConfig?.Connection?.Port, out var p) ? p : 0
+                Port = int.TryParse(deviceConfig?.Connection?.Port, out var p) ? p : 0,
+                IsConnecting = true
             });
         }
         
@@ -164,7 +165,9 @@ public partial class MainViewModel : ObservableObject
             {
                 deviceVm.Status = device.Status.ToString();
                 deviceVm.IsConnected = device.Status == DeviceStatus.Connected;
+                deviceVm.ConnectionFailed = !deviceVm.IsConnected;
             }
+            deviceVm.IsConnecting = false;
         }
         
         UpdateCanRun();

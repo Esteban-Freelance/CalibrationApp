@@ -15,6 +15,9 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         
+        <!-- Inverse Bool Converter -->
+        <local:InverseBoolConverter x:Key="InverseBoolConverter" xmlns:local="clr-namespace:CalibrationApp.Views"/>
+        
         <!-- Log Level to Color Converter -->
         <Style TargetType="TextBlock" x:Key="LogEntryStyle">
             <Style.Triggers>
@@ -185,13 +188,15 @@
                                                     CommandParameter="{Binding}"
                                                     ToolTip="Reconnect"
                                                     Width="28" Height="28" Padding="0"
-                                                    Background="#F3F4F6" BorderThickness="1" BorderBrush="#D1D5DB" Margin="0,0,0,4"/>
+                                                    Background="#F3F4F6" BorderThickness="1" BorderBrush="#D1D5DB" Margin="0,0,0,4"
+                                                    IsEnabled="{Binding IsConnecting, Converter={StaticResource InverseBoolConverter}}"/>
                                             <Button Content="⚙" 
                                                     Command="{Binding DataContext.EditDeviceConfigCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}"
                                                     ToolTip="Edit Config"
                                                     Width="28" Height="28" Padding="0"
-                                                    Background="#F3F4F6" BorderThickness="1" BorderBrush="#D1D5DB"/>
+                                                    Background="#F3F4F6" BorderThickness="1" BorderBrush="#D1D5DB"
+                                                    IsEnabled="{Binding IsConnecting, Converter={StaticResource InverseBoolConverter}}"/>
                                         </StackPanel>
                                     </Grid>
                                 </Border>

@@ -1,6 +1,8 @@
 using System;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Collections.Specialized;
@@ -118,7 +120,7 @@ public partial class MainWindow : Window
             Title = $"Edit {deviceVm.Role} Config",
             Width = 400,
             Height = 220,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
             ResizeMode = ResizeMode.NoResize,
             Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F4F6")),
             Padding = new Thickness(24)
@@ -169,5 +171,22 @@ public partial class MainWindow : Window
         dialog.Content = panel;
         
         dialog.ShowDialog();
+    }
+}
+
+public class InverseBoolConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is bool boolValue)
+            return !boolValue;
+        return value;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is bool boolValue)
+            return !boolValue;
+        return value;
     }
 }
