@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>app-icon.ico</ApplicationIcon>
+
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,6 +28,9 @@
   <ItemGroup>
     <None Update="Configs\TestBenches\RealRecept.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="app-icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

@@ -388,32 +388,47 @@
             </Border>
         </Grid>
         
-        <!-- Log Panel -->
+        <!-- Log Panel with Footer Icon -->
         <Border Grid.Row="2" Background="White" CornerRadius="8" Padding="16" Margin="0,16,0,0">
-            <DockPanel>
-                <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
-                    <TextBlock Text="Log" FontWeight="SemiBold" FontSize="14"/>
-                    <Button Content="Clear" Command="{Binding ClearLogCommand}" 
-                            HorizontalAlignment="Right" 
-                            Background="Transparent" BorderThickness="0" 
-                            Foreground="{StaticResource PrimaryBrush}" Cursor="Hand"/>
-                </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
                 
-                <Border Background="#1F2937" CornerRadius="4" Padding="8">
-                    <ScrollViewer x:Name="LogScrollViewer" VerticalScrollBarVisibility="Auto">
-                        <ItemsControl ItemsSource="{Binding LogEntries}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding FormattedMessage}" 
-                                               FontFamily="Consolas" FontSize="12"
-                                               Style="{StaticResource LogEntryStyle}"
-                                               TextWrapping="NoWrap"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
-                </Border>
-            </DockPanel>
+                <DockPanel Grid.Column="0" Margin="0,0,16,0">
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
+                        <TextBlock Text="Log" FontWeight="SemiBold" FontSize="14"/>
+                        <Button Content="Clear" Command="{Binding ClearLogCommand}" 
+                                HorizontalAlignment="Right" 
+                                Background="Transparent" BorderThickness="0" 
+                                Foreground="{StaticResource PrimaryBrush}" Cursor="Hand"/>
+                    </Grid>
+                    
+                    <Border Background="#1F2937" CornerRadius="4" Padding="8">
+                        <ScrollViewer x:Name="LogScrollViewer" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding LogEntries}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding FormattedMessage}" 
+                                                   FontFamily="Consolas" FontSize="12"
+                                                   Style="{StaticResource LogEntryStyle}"
+                                                   TextWrapping="NoWrap"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+                </DockPanel>
+                
+                <!-- Footer Icon -->
+                <Image Grid.Column="1" 
+                       Source="app-icon.png" 
+                       Width="128" Height="128"
+                       Stretch="Uniform"
+                       VerticalAlignment="Bottom"
+                       Opacity="0.8"/>
+            </Grid>
         </Border>
     </Grid>
 </Window>
