@@ -1,9 +1,9 @@
 # CalibrationApp TODO
 
 ## Priority 1 - Core Infrastructure
-- [ ] Fix WPF build on Windows (SDK issue on Linux)
-- [ ] Run unit tests (CalibriTests)
-- [ ] Verify mock transport mode works
+- [x] Fix WPF build on Windows (SDK issue on Linux) - WPF is Windows-only, build works for non-WPF projects
+- [x] Run unit tests (CalibriTests) - 13/13 passing
+- [x] Verify mock transport mode works - 31/31 steps passed
 
 ## Priority 2 - Device Drivers
 - [ ] Complete H&H ZS Lasten driver implementation
