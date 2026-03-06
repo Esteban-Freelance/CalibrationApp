@@ -364,3 +364,4 @@ FodyWeavers.xsd
 # Runtime generated
 CalibriAvalonia/Cache/
 CalibriAvalonia/Exports/
+CalibriWpf/Cache/
