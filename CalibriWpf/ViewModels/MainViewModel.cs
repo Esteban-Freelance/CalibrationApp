@@ -1,11 +1,12 @@
-using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+using CalibrationDevices.Interfaces;
+using CalibrationDevices.Logging;
 using CalibriCore.Models;
 using CalibriCore.Services;
-using CalibrationDevices.Interfaces;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
 using System.IO;
-using CalibrationDevices.Logging;
+using System.Net.NetworkInformation;
 
 namespace CalibrationApp.ViewModels;
 
@@ -68,13 +69,13 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private CalibrationResult _overallResult = CalibrationResult.NotStarted;
     
-    public ObservableCollection<LogEntry> LogEntries => ConsoleLogService.Instance.LogEntries;
+    public ObservableCollection<LogEntry> LogEntries => WpfLogService.Instance.LogEntries;
     
     private List<DeviceConfig> _deviceConfigs = new();
     
     public MainViewModel()
     {
-        _log = ConsoleLogService.Instance;
+        _log = WpfLogService.Instance;
         
         var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Configs");
         var cachePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache", "Reports");
@@ -140,9 +141,12 @@ public partial class MainViewModel : ObservableObject
             // Get device config for address/port
             var deviceConfig = _deviceConfigs.FirstOrDefault(d => 
                 d.Name.Equals(device.Name, StringComparison.OrdinalIgnoreCase));
+
+            _testBench.DeviceStatusChanged += _testBench_DeviceStatusChanged;
             
             Devices.Add(new DeviceViewModel
             {
+                Id = device.Id,
                 Role = role,
                 Name = device.Name,
                 DeviceType = device.DeviceType,
@@ -156,23 +160,19 @@ public partial class MainViewModel : ObservableObject
         
         // Auto-connect devices
         await _testBench.ConnectAllAsync();
-        
-        // Update device status in UI
-        foreach (var deviceVm in Devices)
-        {
-            var device = _testBench.GetDeviceByRole(deviceVm.Role);
-            if (device != null)
-            {
-                deviceVm.Status = device.Status.ToString();
-                deviceVm.IsConnected = device.Status == DeviceStatus.Connected;
-                deviceVm.ConnectionFailed = !deviceVm.IsConnected;
-            }
-            deviceVm.IsConnecting = false;
-        }
-        
+    }
+
+    private void _testBench_DeviceStatusChanged(object? sender, DeviceStatusChangedEventArgs args)
+    {
+        var deviceVm = Devices.First(device => device.Id == args.DeviceId);
+        deviceVm.IsConnecting = args.Status == DeviceStatus.Connecting;
+        deviceVm.ConnectionFailed = !deviceVm.IsConnected;
+        deviceVm.IsConnected = args.Status == DeviceStatus.Connected;
+        deviceVm.Status = args.Status.ToString();
+
         UpdateCanRun();
     }
-    
+
     partial void OnSelectedRecipeChanged(Recipe? value)
     {
         Steps.Clear();
@@ -274,17 +274,22 @@ public partial class MainViewModel : ObservableObject
     {
         LoadConfigurations();
     }
-    
-    [RelayCommand]
+
+    [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task ReconnectDeviceAsync(DeviceViewModel deviceVm)
     {
         if (string.IsNullOrEmpty(deviceVm.Role)) return;
         
         _log.Info($"Reconnecting device: {deviceVm.Role}");
-        
+
         // Reset states
-        deviceVm.IsConnecting = true;
         deviceVm.ConnectionFailed = false;
+        deviceVm.IsConnected = false;
+        deviceVm.Status = DeviceStatus.Connecting.ToString();
+        deviceVm.IsConnecting = true;
+
+
+
         
         var device = _testBench.GetDeviceByRole(deviceVm.Role);
         if (device != null)
@@ -468,6 +473,9 @@ public partial class MainViewModel : ObservableObject
 
 public partial class DeviceViewModel : ObservableObject
 {
+    [ObservableProperty]
+    private string _id = "";
+
     [ObservableProperty]
     private string _role = "";
     

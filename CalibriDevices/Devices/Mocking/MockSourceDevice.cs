@@ -137,7 +137,7 @@ public class MockSourceDevice : ISourceDevice
         _log.Info("Output disabled", Id);
     }
 
-    public Task<SourceStatus> GetOutputStatusAsync()
+    public Task<SourceStatus> GetOutputStatusAsync(SourceParameters parameters)
     {
         return Task.FromResult(new SourceStatus
         {

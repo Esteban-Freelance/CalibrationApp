@@ -4,7 +4,7 @@
         <!-- Power Source -->
         <Device ref="eaPowerSource_001" role="PowerSource" />
         <!-- Reference Meter (Keithley - "Richtiger Wert") -->
-        <Device ref="keithley3706a_001" role="Reference" />
+        <Device ref="keithley3706a_001" role="ReferenceMeter" />
         <!-- DUT (H&amp;H ZS Lasten - "Anzeige") -->
         <Device ref="hhload_001" role="DUT" />
         <!-- Switch/Relay for routing -->

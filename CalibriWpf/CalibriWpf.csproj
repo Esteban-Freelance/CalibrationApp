@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
-
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,11 +25,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Configs\TestBenches\RealRecept.xml">
+    <None Update="Configs\Recipes\Recipe_HuH_Load_60V_Voltage.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="app-icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None Update="Configs\TestBenches\RealRecept.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

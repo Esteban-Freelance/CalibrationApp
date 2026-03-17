@@ -132,7 +132,7 @@ public class MockHighVoltageSource : ISourceDevice
         _log.Info("HV output disabled - safe", Id);
     }
 
-    public Task<SourceStatus> GetOutputStatusAsync()
+    public Task<SourceStatus> GetOutputStatusAsync(SourceParameters parameters)
     {
         return Task.FromResult(new SourceStatus
         {

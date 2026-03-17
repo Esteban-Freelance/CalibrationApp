@@ -4,7 +4,7 @@
     <Driver>HhMeasurementDevice</Driver>
     <Name>H&amp;H ZS Lasten (DUT)</Name>
     <Connection type="GPIB">
-        <Address>1</Address>
+        <Address>2</Address>
         <Board>0</Board>
         <Timeout>5000</Timeout>
     </Connection>

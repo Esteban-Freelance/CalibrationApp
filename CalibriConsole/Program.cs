@@ -9,6 +9,10 @@ class Program
 {
     static async Task Main(string[] args)
     {
+        var scanner = new NetworkScanner();
+        var scans = await scanner.ScanLocalSubnetAsync();
+
+
         if (args.Length == 0)
         {
             PrintHelp();

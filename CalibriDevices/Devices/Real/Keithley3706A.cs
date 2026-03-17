@@ -61,12 +61,14 @@ namespace CalibrationDevices.Devices.Real
                     _status = DeviceStatus.Error;
                     return false;
                 }
+                _log.Debug("*IDN?", idn);
 
                 _status = DeviceStatus.Connected;
                 return true;
             }
-            catch
+            catch(Exception ex)
             {
+                _log.Error($"Connection failed {ex.Message}", Name);
                 _status = DeviceStatus.Error;
                 return false;
             }
@@ -98,6 +100,31 @@ namespace CalibrationDevices.Devices.Real
         // ──────────────────────────────────────────────
         //  IMeasurementDevice
         // ──────────────────────────────────────────────
+
+        public async Task<Dictionary<int, string>> GetInstalledCards()
+        {
+            var cards = new Dictionary<int, string>();
+
+            for (int slot = 1; slot <= 6; slot++)
+            {
+                try
+                {
+                    string response = await Query($":SYST:CARD{slot}:IDN?");
+                    response = response.Trim();
+
+                    if (!string.IsNullOrEmpty(response) && response != "0")
+                        cards[slot] = response;
+                    else
+                        cards[slot] = "Empty";
+                }
+                catch
+                {
+                    cards[slot] = "Unknown";
+                }
+            }
+
+            return cards;
+        }
 
         public async Task<MeasurementResult> MeasureAsync(MeasurementParameters parameters)
         {
@@ -156,13 +183,17 @@ namespace CalibrationDevices.Devices.Real
         /// </summary>
         private async Task<double> MeasureDirectAsync(MeasurementParameters parameters)
         {
+
+
             string funcConst = GetTspFunction(parameters.Type);
             await Send($"dmm.func = {funcConst}");
             await Send($"dmm.range = {FormatNumber(parameters.Range)}");
             await Send("dmm.autodelay = dmm.ON");
-            await Send($"dmm.close(\"{parameters.Channel}\")");
 
-            return await TakeReadingAsync(parameters.SampleCount);
+            await Send($"dmm.close(\"{parameters.Channel}\")");
+            var value = await TakeReadingAsync(parameters.SampleCount);
+
+            return value;
         }
 
         /// <summary>
@@ -175,7 +206,7 @@ namespace CalibrationDevices.Devices.Real
                 throw new ArgumentException("ShuntResistance must be set and > 0 for CurrentShunt measurement");
 
             // Measure voltage across the shunt
-            await Send("dmm.func = dmm.DC_VOLTS");
+            await Send($"dmm.func = dmm.DC_VOLTS");
             await Send($"dmm.range = {FormatNumber(parameters.Range)}");
             await Send("dmm.autodelay = dmm.ON");
             await Send($"dmm.close(\"{parameters.Channel}\")");
@@ -381,6 +412,65 @@ namespace CalibrationDevices.Devices.Real
                 return val;
 
             throw new FormatException($"Could not parse measurement value: '{cleaned}'");
+        }
+
+        public async Task<Dictionary<int, List<double>>> ReadAllChannelVoltagesAsync()
+        {
+            // Query installed cards
+            var options = await Query("*OPT?");
+            // Response example: "7700, NONE" or "7702, 7700"
+            var slots = options.Split(',');
+
+            var results = new Dictionary<int, List<double>>();
+
+            for (int slot = 0; slot < slots.Length; slot++)
+            {
+                var card = slots[slot].Trim();
+                if (card == "NONE" || string.IsNullOrEmpty(card))
+                    continue;
+
+                int slotNumber = slot + 1; // Slots are 1-based
+                int channelCount = GetChannelCount(card);
+                var voltages = new List<double>();
+
+                for (int ch = 1; ch <= channelCount; ch++)
+                {
+                    int channel = (slotNumber * 100) + ch; // e.g. 101, 102, ... 201, 202
+                    var response = await Query($"MEAS:VOLT:DC? (@{channel})");
+                    var cleaned = response.Trim().Split(' ')[0];
+
+                    if (double.TryParse(cleaned, System.Globalization.NumberStyles.Float,
+                        System.Globalization.CultureInfo.InvariantCulture, out double value))
+                    {
+                        voltages.Add(value);
+                    }
+                    else
+                    {
+                        voltages.Add(double.NaN);
+                    }
+                }
+
+                results[slotNumber] = voltages;
+            }
+
+            return results;
+        }
+
+        private int GetChannelCount(string cardModel)
+        {
+            return cardModel switch
+            {
+                "7700" => 20,
+                "7701" => 32,
+                "7702" => 40,
+                "7703" => 32,
+                "7706" => 20,
+                "7707" => 10,
+                "7708" => 40,
+                "7709" => 6,
+                "7710" => 20,
+                _ => 20 // default fallback
+            };
         }
     }
 }

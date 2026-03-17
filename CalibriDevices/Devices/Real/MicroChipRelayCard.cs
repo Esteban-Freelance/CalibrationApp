@@ -1,4 +1,5 @@
 ﻿using CalibrationDevices.Interfaces;
+using CalibrationDevices.Logging;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 
@@ -8,6 +9,7 @@ namespace CalibrationDevices.Devices.Real
     {
         private readonly RelayCardConfig _config;
         private readonly HttpClient _http;
+        private readonly ILogService _log;
         private DeviceStatus _status = DeviceStatus.Disconnected;
         private string? _indexPageSource;
 
@@ -40,12 +42,13 @@ namespace CalibrationDevices.Devices.Real
         public string DeviceType => "RelayCard";
         public DeviceStatus Status => _status;
 
-        public MicrochipRelayCard(string id, string name, RelayCardConfig config)
+        public MicrochipRelayCard(string id, string name, RelayCardConfig config, ILogService logService = null)
         {
             Id = id;
             Name = name;
             _config = config;
             _http = new HttpClient { Timeout = TimeSpan.FromMilliseconds(config.TimeoutMs) };
+            _log = logService ?? NullLogService.Instance;
         }
 
         // ──────────────────────────────────────────────
@@ -62,6 +65,7 @@ namespace CalibrationDevices.Devices.Real
                 {
                     _indexPageSource = await response.Content.ReadAsStringAsync();
                     AutoDiscoverEndpoints(_indexPageSource);
+                    _log.Debug(_indexPageSource);
                     _status = DeviceStatus.Connected;
                     return true;
                 }

@@ -4,7 +4,7 @@
 	<Driver>eaps8720u</Driver>
 	<Name>EA PowerSource</Name>
 	<Connection type="TCP">
-		<Address>192.168.178.22</Address>
+		<Address>192.168.178.23</Address>
 		<Port>1001</Port>
 		<Board>0</Board>
 		<Timeout>5000</Timeout>

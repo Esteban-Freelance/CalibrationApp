@@ -7,18 +7,10 @@ using CalibrationDevices.Interfaces;
 Console.WriteLine("Hi, Calibri");
 Console.WriteLine("Scanning Network");
 
-//var network = new NetworkScanner();
-//var scans = await network.ScanLocalSubnetAsync();
-
-//foreach(var scan in scans)
-//{
-//    Console.WriteLine($"{scan.IP} {scan.Hostname}");
-//}
-
 Console.WriteLine("Keythley3706A");
 var keythleyConfig = new TcpConfig
 {
-    IpAddress = "192.168.178.23",
+    IpAddress = "192.168.178.20",
     Port = 5025,
     TimeoutMs = 5000
 };
@@ -40,11 +32,14 @@ var shuntCurrentParams = new MeasurementParameters
     Range = 100,
     SampleCount = 2,
     Unit = "A",
-    Channel = "1002"
+    Channel = "1001"
 };
 
 
-await keythley.ConnectAsync();
+bool v = await keythley.ConnectAsync();
+
+
+
 var VoltageMeasurement = await keythley.MeasureAsync(parameters);
 Console.WriteLine($"{VoltageMeasurement.Value} {VoltageMeasurement.Unit}");
 

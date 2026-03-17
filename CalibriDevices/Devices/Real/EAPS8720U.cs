@@ -54,6 +54,8 @@ public class EAPS8720U : ISourceDevice
             var idn = await QueryAsync("*IDN?");
             _log.Info($"Connected: {idn}", Name);
 
+            await SendCommandAsync("*RST");
+
             _status = DeviceStatus.Connected;
             return true;
         }
@@ -111,26 +113,33 @@ public class EAPS8720U : ISourceDevice
     public async Task SetOutputAsync(SourceParameters parameters)
     {
         EnsureConnected();
+        await SendCommandAsync("SYST:LOCK 1");        // not just LOCK ON
+        await SendCommandAsync("OUTP OFF");
+        await ConfigureSourceAsync(parameters);
+        await SendCommandAsync("OUTP ON");
+    }
 
+    private async Task ConfigureSourceAsync(SourceParameters parameters)
+    {
         switch (parameters.Type)
         {
             case SourceType.VoltageDC:
                 _log.Debug($"Setting voltage to {parameters.Value} V", Name);
-                await SendCommandAsync($"VOLT {parameters.Value.ToString("F4", System.Globalization.CultureInfo.InvariantCulture)}");
+                await SendCommandAsync($"VOLT {parameters.Value.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}");
 
-                // If a current limit is specified, set it too
                 if (parameters.CurrentLimit.HasValue)
                 {
                     _log.Debug($"Setting current limit to {parameters.CurrentLimit.Value} A", Name);
-                    await SendCommandAsync($"CURR {parameters.CurrentLimit.Value.ToString("F4", System.Globalization.CultureInfo.InvariantCulture)}");
+                    var currentOne = $"SOURce:CURRent {parameters.CurrentLimit.Value.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}";
+                    await SendCommandAsync(currentOne);
                 }
                 break;
 
             case SourceType.CurrentDC:
                 _log.Debug($"Setting current to {parameters.Value} A", Name);
-                await SendCommandAsync($"CURR {parameters.Value.ToString("F6", System.Globalization.CultureInfo.InvariantCulture)}");
+                var current = $"SOUR:CURR {parameters.Value.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}";
+                await SendCommandAsync(current);
 
-                // If a voltage limit is specified, set it too
                 if (parameters.VoltageLimit.HasValue)
                 {
                     _log.Debug($"Setting voltage limit to {parameters.VoltageLimit.Value} V", Name);
@@ -157,7 +166,7 @@ public class EAPS8720U : ISourceDevice
         await SendCommandAsync("OUTP 0");
     }
 
-    public async Task<SourceStatus> GetOutputStatusAsync()
+    public async Task<SourceStatus> GetOutputStatusAsync(SourceParameters parameters)
     {
         EnsureConnected();
 
@@ -311,8 +320,9 @@ public class EAPS8720U : ISourceDevice
     private async Task<double> QueryDoubleAsync(string query)
     {
         var response = await QueryAsync(query);
+        var cleaned = response.Trim().Split(' ')[0];
 
-        if (double.TryParse(response, System.Globalization.NumberStyles.Float,
+        if (double.TryParse(cleaned, System.Globalization.NumberStyles.Float,
             System.Globalization.CultureInfo.InvariantCulture, out double value))
         {
             return value;

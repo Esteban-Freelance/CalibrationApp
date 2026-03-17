@@ -249,7 +249,9 @@ public class RecipeRunner
             var parameters = new SourceParameters
             {
                 Value = step.Parameters?.Voltage ?? step.Parameters?.Current ?? 0,
-                Unit = step.Parameters?.Unit ?? "V"
+                Unit = step.Parameters?.Unit ?? "V",
+                
+
             };
 
             // Determine source type from parameters
@@ -263,7 +265,11 @@ public class RecipeRunner
             }
 
             await source.SetOutputAsync(parameters);
+            await Task.Delay(2500);
             await source.EnableOutputAsync();
+            await Task.Delay(2500);
+            var setoutput = await source.GetOutputStatusAsync(parameters);
+
 
             return new StepResult { Passed = true };
         }
@@ -296,7 +302,9 @@ public class RecipeRunner
             {
                 Type = measurementType,
                 Range = step.Parameters?.Range ?? 0,
-                Unit = step.Parameters?.Unit ?? "V"
+                Unit = step.Parameters?.Unit ?? "V",
+                Channel = step.Parameters?.Channel.ToString(),
+                ShuntResistance = step.Parameters?.ShuntResistance ?? null
             };
 
             var measurement = await meter.MeasureAsync(parameters);
@@ -514,6 +522,7 @@ public class RecipeRunner
             if (step.Parameters?.RouteName != null)
             {
                 await switchDevice.SetChannelAsync(step.Parameters.RouteName);
+                //var x = await switchDevice.GetCurrentChannelAsync();
             }
             else if (step.Parameters?.Channel.HasValue == true)
             {

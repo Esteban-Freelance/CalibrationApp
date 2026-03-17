@@ -36,10 +36,10 @@ public static class DeviceFactory
             return new Keithley3706A(config.Id, config.Name, CreateTcpConfig(config.Connection), log);
 
         if (driver == "microchiprelaycard")
-            return new MicrochipRelayCard(config.Id, config.Name, CreateRelayCardConfig(config.Connection));
+            return new MicrochipRelayCard(config.Id, config.Name, CreateRelayCardConfig(config.Connection), log);
 
         if (driver == "hhload" || driver == "hhmeasurementdevice")
-            return new HhMeasurementDevice(config.Id, CreateVisaResource(config.Connection));
+            return new HhMeasurementDevice(config.Id, CreateVisaResource(config.Connection), log);
 
         throw new ArgumentException($"Unknown driver type: {config.Driver}");
     }

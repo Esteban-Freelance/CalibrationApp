@@ -4,7 +4,7 @@
     <Driver>Keithley3706A</Driver>
     <Name>Keithley 3706A Reference Multimeter</Name>
     <Connection type="TCP">
-        <Address>192.168.178.23</Address>
+        <Address>192.168.178.20</Address>
         <Port>5025</Port>
         <Timeout>5000</Timeout>
     </Connection>

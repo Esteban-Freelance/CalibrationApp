@@ -8,7 +8,7 @@ public interface ISourceDevice : IDevice
     Task SetOutputAsync(SourceParameters parameters);
     Task EnableOutputAsync();
     Task DisableOutputAsync();
-    Task<SourceStatus> GetOutputStatusAsync();
+    Task<SourceStatus> GetOutputStatusAsync(SourceParameters parameters = null);
     Task<IEnumerable<SourceCapability>> GetCapabilitiesAsync();
 }
 

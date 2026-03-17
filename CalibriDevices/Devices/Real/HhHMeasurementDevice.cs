@@ -1,6 +1,7 @@
 ﻿namespace CalibrationDevices.Devices.Real;
 
     using CalibrationDevices.Interfaces;
+using CalibrationDevices.Logging;
 using NationalInstruments.Visa;
 using System;
 using System.Collections.Generic;
@@ -14,36 +15,50 @@ public class HhMeasurementDevice : IMeasurementDevice, IDisposable
     private readonly string _id;
     private string _name = "H&H Load";
     private DeviceStatus _status = DeviceStatus.Disconnected;
+    private ILogService _log;
 
     public string Id => _id;
     public string Name => _name;
     public string DeviceType => "Load";
     public DeviceStatus Status => _status;
 
-    public HhMeasurementDevice(string id, string resource)
+    public HhMeasurementDevice(string id, string resource, ILogService logService = null)
     {
         _id = id;
         _resource = resource;
+        _log = logService ?? NullLogService.Instance;
     }
 
-    public async Task ConnectAsync()
+    public async Task<bool> ConnectAsync()
     {
+        if (_status == DeviceStatus.Connected)
+            return true;
+
         _status = DeviceStatus.Connecting;
+        _log.Debug($"Connecting toH&H Load at {_resource}...");
 
-        var rm = new ResourceManager();
-        _session = (MessageBasedSession)rm.Open(_resource);
+        try
+        {
+            _status = DeviceStatus.Connecting;
 
-        _session.RawIO.Write("*IDN?\n");
-        string idn = _session.RawIO.ReadString();
+            var rm = new ResourceManager();
+            _session = (MessageBasedSession)rm.Open(_resource);
 
-        _session.RawIO.Write("CURR:RANG?\n");
-        string x = _session.RawIO.ReadString();
+            _session.RawIO.Write("*IDN?\n");
+            var idn = _session.RawIO.ReadString();
+            await ResetAsync();
 
-        _name = ParseName(idn);
+            _name = ParseName(idn);
+            _status = DeviceStatus.Connected;
+            return true;
+        }
+        catch (Exception ex) 
+        {
+            _log.Error($"Connection failed {ex.Message}", Name);
+            _status = DeviceStatus.Error;
+            return false;
+        }
 
-        _status = DeviceStatus.Connected;
-
-        await Task.CompletedTask;
     }
 
     private string ParseName(string idn)
@@ -61,6 +76,12 @@ public class HhMeasurementDevice : IMeasurementDevice, IDisposable
         _session?.Dispose();
         _session = null;
         await Task.CompletedTask;
+    }
+
+    private string Query(string query)
+    {
+        _session.RawIO.Write(query + "\n");
+        return _session.RawIO.ReadString();
     }
 
     public async Task<MeasurementResult> MeasureAsync(MeasurementParameters parameters)
@@ -137,8 +158,36 @@ public class HhMeasurementDevice : IMeasurementDevice, IDisposable
         string command = GetConfigCommand(type, range.MaxValue);
 
         _session.RawIO.Write(command + "\n");
+        await Task.Delay(2500);
+
+        await SetInputOn(type);
+        await Task.Delay(2500);
 
         await Task.CompletedTask;
+    }
+
+    public async Task SetInputOn(MeasurementType type)
+    {
+        switch (type)
+        {
+            case MeasurementType.VoltageDC:
+                return;
+
+            case MeasurementType.CurrentShunt:
+            case MeasurementType.CurrentDC:
+                SetInput();
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+        }
+    }
+
+    private void SetInput()
+    {
+        _session.RawIO.Write("CURR:RANG 12");
+        _session.RawIO.Write("CURR MAX");
+        _session.RawIO.Write("INput ON");
     }
 
     private string GetMeasureCommand(MeasurementType type)
@@ -156,9 +205,9 @@ public class HhMeasurementDevice : IMeasurementDevice, IDisposable
     {
         return type switch
         {
-            MeasurementType.VoltageDC => $"VOLT:RANG {range}",
-            MeasurementType.CurrentDC => $"CURR:RANG {range}",
-            MeasurementType.CurrentShunt => "CURR:RANG:AUTO ON",
+            MeasurementType.VoltageDC => $"VOLT:RANG {range.ToString(CultureInfo.InvariantCulture)}",
+            MeasurementType.CurrentDC => $"CURR:RANG {range.ToString(CultureInfo.InvariantCulture)}",
+            MeasurementType.CurrentShunt => $"CURR:RANG {range.ToString(CultureInfo.InvariantCulture)}",
             _ => throw new NotSupportedException()
         };
     }
@@ -168,14 +217,10 @@ public class HhMeasurementDevice : IMeasurementDevice, IDisposable
         _session?.Dispose();
     }
 
-    Task<bool> IDevice.ConnectAsync()
+    public async Task ResetAsync()
     {
-        throw new NotImplementedException();
-    }
-
-    public Task ResetAsync()
-    {
-        throw new NotImplementedException();
+        _session.RawIO.Write("*RST");
+        await Task.Delay(2500);
     }
 
     public Task<string> GetIdentificationAsync()

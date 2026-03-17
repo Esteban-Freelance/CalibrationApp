@@ -4,7 +4,7 @@
     <Driver>MicrochipRelayCard</Driver>
     <Name>Microchip Relay Card</Name>
     <Connection type="HTTP">
-        <Address>192.168.178.32</Address>
+        <Address>192.168.178.22</Address>
         <Port>80</Port>
         <Timeout>3000</Timeout>
     </Connection>
