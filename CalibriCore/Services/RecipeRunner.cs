@@ -186,6 +186,7 @@ public class RecipeRunner
                 StepType.Wait => await ExecuteWaitStepAsync(step),
                 StepType.Switch => await ExecuteSwitchStepAsync(step),
                 StepType.Message => await ExecuteMessageStepAsync(step),
+                StepType.CompareDevices => await ExecuteCompareDevicesStepAsync(step),
                 _ => new StepResult { Passed = false, ErrorMessage = "Unknown step type" }
             };
 
