@@ -386,12 +386,26 @@ public partial class MainViewModel : ObservableObject
             {
                 stepVm.Status = step.Status.ToString();
                 stepVm.IsCurrent = false;
-                
+
                 if (step.Result?.MeasuredValue.HasValue == true)
                 {
-                    stepVm.MeasuredValue = $"{step.Result.MeasuredValue:F6} {step.Result.Unit}";
-                    CurrentMeasurement = stepVm.MeasuredValue;
-                    
+                    // Check if this is a CompareDevices step with both device values
+                    if (step.Type == StepType.CompareDevices && step.Result.Device1Value.HasValue && step.Result.Device2Value.HasValue)
+                    {
+                        // Display: Device1 value | Device2 value | Difference
+                        var dev1Val = step.Result.Device1Value.Value;
+                        var dev2Val = step.Result.Device2Value.Value;
+                        var diff = dev2Val - dev1Val;
+                        stepVm.MeasuredValue = $"{dev1Val:F6} | {dev2Val:F6} | Δ={diff:F6} {step.Result.Unit}";
+                        CurrentMeasurement = stepVm.MeasuredValue;
+                    }
+                    else
+                    {
+                        // Standard display for other step types
+                        stepVm.MeasuredValue = $"{step.Result.MeasuredValue:F6} {step.Result.Unit}";
+                        CurrentMeasurement = stepVm.MeasuredValue;
+                    }
+
                     if (step.Status == StepStatus.Passed)
                     {
                         CurrentStatus = $"✓ {step.Name}: PASS";

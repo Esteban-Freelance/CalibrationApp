@@ -101,6 +101,50 @@ public class StepParameters
     // Settling time in ms
     [XmlElement("SettlingTimeMs")]
     public int SettlingTimeMs { get; set; } = 1000;
+
+    // For CompareDevices step: first device to measure
+    [XmlElement("DeviceRole1")]
+    public string? DeviceRole1 { get; set; }
+
+    // For CompareDevices step: second device to measure
+    [XmlElement("DeviceRole2")]
+    public string? DeviceRole2 { get; set; }
+
+    // For CompareDevices step: how to compare (AbsoluteDifference, PercentDifference, Ratio)
+    [XmlElement("ComparisonType")]
+    public ComparisonType ComparisonType { get; set; } = ComparisonType.AbsoluteDifference;
+
+    // For CompareDevices step: custom parameters for device 1
+    [XmlElement("Role1Parameters")]
+    public DeviceParameters? Role1Parameters { get; set; }
+
+    // For CompareDevices step: custom parameters for device 2
+    [XmlElement("Role2Parameters")]
+    public DeviceParameters? Role2Parameters { get; set; }
+}
+
+/// <summary>
+/// Device-specific parameters for CompareDevices step
+/// </summary>
+public class DeviceParameters
+{
+    [XmlElement("Range")]
+    public double? Range { get; set; }
+
+    [XmlElement("Unit")]
+    public string Unit { get; set; } = string.Empty;
+
+    [XmlElement("MeasurementType")]
+    public string? MeasurementType { get; set; }
+
+    [XmlElement("Channel")]
+    public int? Channel { get; set; }
+
+    [XmlElement("ShuntResistance")]
+    public double? ShuntResistance { get; set; }
+
+    [XmlElement("RouteName")]
+    public string? RouteName { get; set; }
 }
 
 public class Tolerance
@@ -157,18 +201,27 @@ public class StepResult
     public DateTime Timestamp { get; set; } = DateTime.Now;
     public string? ErrorMessage { get; set; }
     public double? Deviation { get; set; }
-    
+
     // For calibration: reference measurement (Keithley) - "Richtiger Wert"
     public double? ReferenceValue { get; set; }
-    
-    // For calibration: DUT readback (H&H) - "Anzeige"  
+
+    // For calibration: DUT readback (H&H) - "Anzeige"
     public double? DUTValue { get; set; }
-    
+
     // Measurement uncertainty (per ISO 17025)
     public double? Uncertainty { get; set; }
-    
+
     // Warning if >70% of tolerance
     public bool IsWarning { get; set; }
+
+    // For CompareDevices step: first device value
+    public double? Device1Value { get; set; }
+
+    // For CompareDevices step: second device value
+    public double? Device2Value { get; set; }
+
+    // For CompareDevices step: calculated comparison result
+    public double? ComparisonResult { get; set; }
 }
 
 public enum StepType
@@ -177,7 +230,8 @@ public enum StepType
     Measurement,
     Wait,
     Switch,
-    Message
+    Message,
+    CompareDevices
 }
 
 public enum StepStatus
@@ -196,4 +250,11 @@ public enum FailAction
     Abort,       // Stop the recipe
     Continue,    // Continue to next step
     Shutdown     // Safe shutdown all devices
+}
+
+public enum ComparisonType
+{
+    AbsoluteDifference,  // |Value1 - Value2|
+    PercentDifference,   // ((Value1 - Value2) / Value1) * 100
+    Ratio                // Value1 / Value2
 }

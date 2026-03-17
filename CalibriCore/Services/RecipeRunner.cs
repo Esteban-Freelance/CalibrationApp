@@ -542,6 +542,178 @@ public class RecipeRunner
         return Task.FromResult(new StepResult { Passed = true });
     }
 
+    /// <summary>
+    /// Execute a CompareDevices step: measure two devices simultaneously and compare their values.
+    /// </summary>
+    private async Task<StepResult> ExecuteCompareDevicesStepAsync(RecipeStep step)
+    {
+        var p = step.Parameters;
+        var role1 = p?.DeviceRole1;
+        var role2 = p?.DeviceRole2;
+
+        if (string.IsNullOrEmpty(role1) || string.IsNullOrEmpty(role2))
+        {
+            return new StepResult { Passed = false, ErrorMessage = "CompareDevices step requires DeviceRole1 and DeviceRole2" };
+        }
+
+        _log.Info($"CompareDevices: {role1} vs {role2}");
+
+        // Get both devices
+        var device1 = _testBench.GetDeviceByRole(role1);
+        var device2 = _testBench.GetDeviceByRole(role2);
+
+        if (device1 is not IMeasurementDevice meter1)
+        {
+            return new StepResult { Passed = false, ErrorMessage = $"Device1 not found or not a meter: {role1}" };
+        }
+
+        if (device2 is not IMeasurementDevice meter2)
+        {
+            return new StepResult { Passed = false, ErrorMessage = $"Device2 not found or not a meter: {role2}" };
+        }
+
+        // Get measurement parameters - use device-specific if provided, otherwise fall back to common parameters
+        var (parameters1, parameters2) = GetCompareDevicesParameters(p);
+
+        // Measure both devices SIMULTANEOUSLY using Task.WhenAll
+        var sampleCount = Math.Max(1, p?.SampleCount ?? 5);
+        var settlingTimeMs = p?.SettlingTimeMs ?? 1000;
+
+        var measurements1 = new List<double>();
+        var measurements2 = new List<double>();
+
+        for (int i = 0; i < sampleCount; i++)
+        {
+            if (settlingTimeMs > 0 && i > 0)
+                await Task.Delay(settlingTimeMs);
+
+            // Measure both devices at the same time
+            var task1 = meter1.MeasureAsync(parameters1);
+            var task2 = meter2.MeasureAsync(parameters2);
+
+            await Task.WhenAll(task1, task2);
+
+            var m1 = task1.Result;
+            var m2 = task2.Result;
+
+            if (!m1.IsValid)
+            {
+                return new StepResult { Passed = false, ErrorMessage = $"Device1 measurement failed: {m1.ErrorMessage}" };
+            }
+            if (!m2.IsValid)
+            {
+                return new StepResult { Passed = false, ErrorMessage = $"Device2 measurement failed: {m2.ErrorMessage}" };
+            }
+
+            measurements1.Add(m1.Value);
+            measurements2.Add(m2.Value);
+
+            _log.Debug($"Sample {i + 1}: {role1}={m1.Value:F6}, {role2}={m2.Value:F6}");
+        }
+
+        var value1 = measurements1.Average();
+        var value2 = measurements2.Average();
+        var unit = parameters1.Unit;
+
+        // Calculate comparison based on comparison type
+        double comparisonResult;
+        double? deviation = null;
+
+        switch (p?.ComparisonType ?? ComparisonType.AbsoluteDifference)
+        {
+            case ComparisonType.AbsoluteDifference:
+                comparisonResult = Math.Abs(value1 - value2);
+                deviation = value2 - value1;
+                break;
+
+            case ComparisonType.PercentDifference:
+                if (value1 == 0)
+                {
+                    return new StepResult { Passed = false, ErrorMessage = "Cannot calculate percent difference: reference value is zero" };
+                }
+                comparisonResult = ((value2 - value1) / Math.Abs(value1)) * 100.0;
+                deviation = comparisonResult;
+                break;
+
+            case ComparisonType.Ratio:
+                if (value2 == 0)
+                {
+                    return new StepResult { Passed = false, ErrorMessage = "Cannot calculate ratio: denominator is zero" };
+                }
+                comparisonResult = value1 / value2;
+                deviation = comparisonResult - 1.0; // Ratio - 1.0
+                break;
+
+            default:
+                comparisonResult = Math.Abs(value1 - value2);
+                break;
+        }
+
+        // Check tolerance
+        bool passed = true;
+        string? errorMessage = null;
+
+        if (step.Tolerance != null)
+        {
+            passed = step.Tolerance.IsWithinTolerance(comparisonResult);
+
+            if (!passed)
+            {
+                errorMessage = $"Comparison {comparisonResult:F6} {unit} out of tolerance (Δ={deviation:F6})";
+            }
+        }
+
+        _log.Info($"CompareDevices result: {role1}={value1:F6}, {role2}={value2:F6}, Comparison={comparisonResult:F6} {unit}, Passed={passed}");
+
+        return new StepResult
+        {
+            Passed = passed,
+            MeasuredValue = comparisonResult,
+            Unit = unit,
+            Device1Value = value1,
+            Device2Value = value2,
+            ComparisonResult = comparisonResult,
+            Deviation = deviation,
+            ErrorMessage = errorMessage,
+            Timestamp = DateTime.Now
+        };
+    }
+
+    /// <summary>
+    /// Gets measurement parameters for both devices, using device-specific parameters if provided.
+    /// </summary>
+    private (MeasurementParameters Params1, MeasurementParameters Params2) GetCompareDevicesParameters(StepParameters? p)
+    {
+        // Default measurement type
+        var measurementType = ParseMeasurementType(p?.MeasurementType);
+
+        // Device 1 parameters - use role-specific if provided, otherwise use common
+        var params1 = new MeasurementParameters
+        {
+            Type = p?.Role1Parameters != null
+                ? ParseMeasurementType(p.Role1Parameters.MeasurementType)
+                : measurementType,
+            Range = p?.Role1Parameters?.Range ?? p?.Range ?? 0,
+            Unit = p?.Role1Parameters?.Unit ?? p?.Unit ?? "V",
+            Channel = p?.Role1Parameters?.Channel?.ToString() ?? p?.Channel?.ToString() ?? "",
+            ShuntResistance = p?.Role1Parameters?.ShuntResistance ?? p?.ShuntResistance
+        };
+
+        // Device 2 parameters - use role-specific if provided, otherwise use common
+        var params2 = new MeasurementParameters
+        {
+            Type = p?.Role2Parameters != null
+                ? ParseMeasurementType(p.Role2Parameters.MeasurementType)
+                : measurementType,
+            Range = p?.Role2Parameters?.Range ?? p?.Range ?? 0,
+            Unit = p?.Role2Parameters?.Unit ?? p?.Unit ?? "V",
+            Channel = p?.Role2Parameters?.Channel?.ToString() ?? p?.Channel?.ToString() ?? "",
+            ShuntResistance = p?.Role2Parameters?.ShuntResistance ?? p?.ShuntResistance
+        };
+
+        return (params1, params2);
+    }
+
     private async Task<FailAction> HandleFailedStepAsync(RecipeStep step)
     {
         var args = new FailedStepEventArgs(step);
